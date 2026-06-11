@@ -1,0 +1,93 @@
+/* Style moderne pour la page profil */
+.profil-container {
+    width: 100%;
+    max-width: 1100px;
+    margin: 60px auto 0 auto;
+    display: flex;
+    gap: 3em;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+}
+.profil-card {
+    background: rgba(255,255,255,0.97);
+    border-radius: 22px;
+    box-shadow: 0 8px 32px #ffd70033, 0 2px 8px #0002;
+    padding: 2em 1.5em 1.5em 1.5em;
+    min-width: 260px;
+    max-width: 340px;
+    flex: 1 1 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 2px solid #ffe9c6;
+}
+.profil-card.edit-form {
+    align-items: flex-start;
+    min-width: 320px;
+    max-width: 420px;
+}
+.profil-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #ffd700;
+    margin-bottom: 1em;
+}
+.profil-card h2 {
+    color: #d4af37;
+    font-size: 1.3em;
+    margin-bottom: .2em;
+    font-weight: bold;
+    text-align: center;
+}
+.profil-type {
+    color: #888;
+    font-size: 1em;
+    margin-bottom: 1em;
+}
+.profil-btn {
+    background: linear-gradient(90deg, #ffe9c6, #fffbe6 80%, #ffd700);
+    color: #333;
+    border: none;
+    border-radius: 18px;
+    padding: .4em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    cursor: pointer;
+    margin: .5em 0;
+    box-shadow: 0 1px 4px #ffd70044;
+    transition: background .2s;
+    text-decoration: none;
+    display: inline-block;
+}
+.profil-btn.delete {
+    background: #ffd7d7;
+    color: #a00;
+    margin-top: .2em;
+}
+.profil-card.edit-form form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+.profil-card.edit-form input,
+.profil-card.edit-form select {
+    border-radius: 12px;
+    border: 1.5px solid #ffd70099;
+    padding: .6em 1em;
+    font-size: 1em;
+    background: #fffbe6;
+    margin-bottom: 0;
+}
+.profil-card.edit-form button[type="submit"] {
+    margin-top: 1em;
+}
+@media (max-width: 900px) {
+    .profil-container {
+        flex-direction: column;
+        align-items: center;
+    }
+}

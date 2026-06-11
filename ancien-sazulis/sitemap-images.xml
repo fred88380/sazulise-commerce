@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <!-- Accueil : branding / visuels principaux -->
+  <url>
+    <loc>https://sazulis.fr/</loc>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/sazulis-logo1.png</image:loc>
+      <image:title>Sazulis - Logo</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/Sazulis-tampon0000.png</image:loc>
+      <image:title>Sazulis - Tampon</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/index.png</image:loc>
+      <image:title>Page d’accueil Sazulis</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/boutique.png</image:loc>
+      <image:title>Boutique Sazulis</image:title>
+    </image:image>
+  </url>
+
+  <!-- Produits : catégories / packs -->
+  <url>
+    <loc>https://sazulis.fr/pages/products.php</loc>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/vitrine-site.png</image:loc>
+      <image:title>Site vitrine pack starter HTML</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/vitrine-site.png</image:loc>
+      <image:title>Site vitrine pack starter Next.js</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/site-vitrine.png</image:loc>
+      <image:title>Pack site vitrine</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/e-commerce2.png</image:loc>
+      <image:title>E-commerce</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/application-web.png</image:loc>
+      <image:title>Application web</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/seo.png</image:loc>
+      <image:title>SEO</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/maintenance.jpg</image:loc>
+      <image:title>Maintenance</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/hebergement.jpg</image:loc>
+      <image:title>Hébergement</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/promo.png</image:loc>
+      <image:title>Promotion</image:title>
+    </image:image>
+  </url>
+
+  <!-- Créations : démos / réalisations -->
+  <url>
+    <loc>https://sazulis.fr/pages/creations.php</loc>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/demo1.jpg</image:loc>
+      <image:title>Démo site 1</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/demo2.jpg</image:loc>
+      <image:title>Démo site 2</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/wordpress.jpg</image:loc>
+      <image:title>WordPress</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/refonte-site-internet.jpg</image:loc>
+      <image:title>Refonte site internet</image:title>
+    </image:image>
+  </url>
+
+  <!-- Contact : visuels UI -->
+  <url>
+    <loc>https://sazulis.fr/pages/contact.php</loc>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/contact.png</image:loc>
+      <image:title>Contact</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/connexion.png</image:loc>
+      <image:title>Connexion</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/voir.png</image:loc>
+      <image:title>Voir mot de passe</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/cache.png</image:loc>
+      <image:title>Cacher mot de passe</image:title>
+    </image:image>
+  </url>
+
+  <!-- Audit / Rapport : si c’est une page publique indexable -->
+  <url>
+    <loc>https://sazulis.fr/pages/produits/seo-premium.php</loc>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/audit.png</image:loc>
+      <image:title>Audit SEO</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/audit2.png</image:loc>
+      <image:title>Audit SEO - Exemple</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/rapport.png</image:loc>
+      <image:title>Rapport</image:title>
+    </image:image>
+  </url>
+
+</urlset>

@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <url>
+    <loc>https://sazulis.fr/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <url>
+    <loc>https://sazulis.fr/pages/products</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://sazulis.fr/pages/creations</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://sazulis.fr/pages/contact</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://sazulis.fr/pages/apropos</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://sazulis.fr/pages/paiement-securise</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://sazulis.fr/pages/mentions-legales</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://sazulis.fr/pages/cgv</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://sazulis.fr/pages/cgu</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://sazulis.fr/pages/conditions-livraison</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url><loc>https://sazulis.fr/pages/produits/wordpress-cms-nextjs</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sazulis.fr/pages/produits/wordpress-cms-html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sazulis.fr/pages/produits/site-vitrine-pack-starter-nextjs</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sazulis.fr/pages/produits/site-vitrine-pack-starter-html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sazulis.fr/pages/produits/site-vitrine-nextjs</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sazulis.fr/pages/produits/site-vitrine-html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <url><loc>https://sazulis.fr/pages/produits/seo-premium</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sazulis.fr/pages/produits/seo-business</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sazulis.fr/pages/produits/seo-basic</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <url><loc>https://sazulis.fr/pages/produits/refonte-site-nextjs</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sazulis.fr/pages/produits/refonte-site-html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <url><loc>https://sazulis.fr/pages/produits/maintenance-urgente</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sazulis.fr/pages/produits/maintenance-premium</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sazulis.fr/pages/produits/maintenance-business</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sazulis.fr/pages/produits/maintenance-basic</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <url><loc>https://sazulis.fr/pages/produits/hebergement-premium-nextjs</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sazulis.fr/pages/produits/hebergement-premium-html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sazulis.fr/pages/produits/hebergement-business-nextjs</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sazulis.fr/pages/produits/hebergement-business-html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sazulis.fr/pages/produits/hebergement-basic-nextjs</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sazulis.fr/pages/produits/hebergement-basic-html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <url>
+    <loc>https://sazulis.fr/</loc>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/sazulis-logo1.png</image:loc>
+      <image:title>Sazulis - Logo</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/Sazulis-tampon0000.png</image:loc>
+      <image:title>Sazulis - Tampon</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/index.png</image:loc>
+      <image:title>Page d’accueil Sazulis</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/boutique.png</image:loc>
+      <image:title>Boutique Sazulis</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://sazulis.fr/pages/products</loc>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/vitrine-site.png</image:loc>
+      <image:title>Site vitrine pack starter HTML</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/vitrine-site.png</image:loc>
+      <image:title>Site vitrine pack starter Next.js</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/site-vitrine.png</image:loc>
+      <image:title>Pack site vitrine</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/e-commerce2.png</image:loc>
+      <image:title>E-commerce</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/application-web.png</image:loc>
+      <image:title>Application web</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/seo.png</image:loc>
+      <image:title>SEO</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/maintenance.jpg</image:loc>
+      <image:title>Maintenance</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/hebergement.jpg</image:loc>
+      <image:title>Hébergement</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/promo.png</image:loc>
+      <image:title>Promotion</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://sazulis.fr/pages/creations</loc>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/demo1.jpg</image:loc>
+      <image:title>Démo site 1</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/demo2.jpg</image:loc>
+      <image:title>Démo site 2</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/wordpress.jpg</image:loc>
+      <image:title>WordPress</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/refonte-site-internet.jpg</image:loc>
+      <image:title>Refonte site internet</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://sazulis.fr/pages/contact</loc>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/contact.png</image:loc>
+      <image:title>Contact</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/connexion.png</image:loc>
+      <image:title>Connexion</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/voir.png</image:loc>
+      <image:title>Voir mot de passe</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/cache.png</image:loc>
+      <image:title>Cacher mot de passe</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://sazulis.fr/pages/produits/seo-premium</loc>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/audit.png</image:loc>
+      <image:title>Audit SEO</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/audit2.png</image:loc>
+      <image:title>Audit SEO - Exemple</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://sazulis.fr/assets/img/rapport.png</image:loc>
+      <image:title>Rapport</image:title>
+    </image:image>
+  </url>
+
+</urlset>

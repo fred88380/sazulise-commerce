@@ -1,0 +1,189 @@
+# Ignorer tous les fichiers HTML, PHP, JS et CSS
+*.html
+*.php
+*.js
+*.css
+*
+# Uncomment below to keep .gitignore and README.md tracked
+!.gitignore
+!README.md
+
+# Ignore folders (redundant with '*', but explicit for clarity)
+app/
+config/
+public/
+sql/
+tools/
+vendor/
+
+# Ignore backup files
+*.backup-*
+
+# Ignore common system files
+.DS_Store
+Thumbs.db
+
+# Ignore node and composer dependencies
+node_modules/
+composer.lock
+
+# Ignore log files
+*.log
+
+# Ignore environment files
+.env
+
+# Ignore IDE/editor files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# ============================
+# FICHIER .gitignore - SAZULIS
+# ============================
+
+# Variables d'environnement et configuration sensible
+.env
+.env.local
+.env.production
+.env.staging
+.env.test
+.env.*
+
+# Base de données
+config/database_config.php
+config/db_credentials.php
+*.sql.backup
+database_backup_*.sql
+
+# Fichiers de logs
+logs/
+*.log
+error.log
+access.log
+debug.log
+php_error.log
+
+# Cache et fichiers temporaires
+cache/
+tmp/
+temp/
+.cache/
+*.tmp
+*.temp
+*.cache
+
+# Sauvegardes
+backups/
+backup_*/
+*.backup
+*.bak
+
+# Uploads utilisateurs (garder le dossier mais pas le contenu)
+public/assets/uploads/*
+!public/assets/uploads/.gitkeep
+!public/assets/uploads/README.md
+
+# Avatars utilisateurs
+public/assets/uploads/avatars/*
+!public/assets/uploads/avatars/README.md
+!public/assets/uploads/avatars/.gitkeep
+
+# Fichiers de session PHP
+sessions/
+*.sess
+
+# Vendor (si Composer est utilisé)
+vendor/
+composer.lock
+
+# Node modules (si npm est utilisé)
+node_modules/
+package-lock.json
+yarn.lock
+
+# IDE et éditeurs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Fichiers système Windows
+desktop.ini
+$RECYCLE.BIN/
+
+# Fichiers système macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Fichiers de développement
+*.dev
+*.test
+*.local
+
+# Clés et certificats
+*.key
+*.pem
+*.crt
+*.cert
+*.p12
+*.pfx
+
+# Fichiers de configuration spécifiques
+config/local.php
+config/production.php
+config/staging.php
+admin/dashboard/backend/config/database.php
+
+# Historique et données sensibles
+.history
+.bash_history
+.mysql_history
+
+# Rapports et analyses
+reports/
+coverage/
+.nyc_output/
+.coverage/
+
+# Fichiers générés automatiquement
+sitemap.xml.gz
+robots.txt.backup
+error_reporting_*.html
+
+# Fichiers temporaires d'outils
+tools/temp/
+tools/logs/
+tools/*.tmp
+
+# Fichiers de maintenance
+maintenance_mode.flag
+.maintenance
+
+# Analytics et statistiques privées
+analytics_data/
+stats_private/
+*.analytics
+
+# Fichiers de test temporaires
+test_*.php
+temp_*.php
+debug_*.php
+
+# Emails en développement (fichiers temporaires)
+emails/sent/
+mail_queue/
+
+# Documentation de développement (si sensible)
+docs/internal/
+dev-notes.md
+TODO_PRIVATE.md
+
+# Optimisations d'images temporaires
+optimized_temp/
+*.optimized.tmp

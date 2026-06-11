@@ -1,0 +1,260 @@
+<?php
+$PROTECT_PATH = __DIR__ . '/../../protect.php';
+if (file_exists($PROTECT_PATH)) require_once $PROTECT_PATH;
+if (session_status() === PHP_SESSION_NONE) session_start();
+require_once __DIR__ . '/../../backend/db.php';
+
+$product = [
+    'id' => 14,
+    'name' => 'Maintenance Urgente',
+    'price' => 200.00,
+    'img' => '../../assets/img/urgente.png',
+    'ref' => 'maintenance-urgente',
+];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
+    $qty = max(1, intval($_POST['qty'] ?? 1));
+    $cart_item = [
+        'id' => $product['id'],
+        'name' => $product['name'],
+        'price' => $product['price'],
+        'img' => $product['img'],
+        'ref' => $product['ref'],
+        'qty' => $qty,
+    ];
+    if (!isset($_SESSION['cart'])) $_SESSION['cart'] = [];
+    $found = false;
+    foreach ($_SESSION['cart'] as &$item) {
+        if ($item['id'] === $cart_item['id']) {
+            $item['qty'] += $qty;
+            $found = true;
+            break;
+        }
+    }
+    unset($item);
+    if (!$found) {
+        $_SESSION['cart'][] = $cart_item;
+    }
+    header('Location: ../panier.php');
+    exit;
+}
+?>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title><?= htmlspecialchars($product['name']) ?> - Assistance 24h - Sazulis</title>
+    <meta name="description" content="Intervention technique rapide en cas de panne ou de bug. Diagnostic complet, assistance prioritaire et remise en ligne de votre site internet sous 24h par Sazulis.">
+    <meta name="keywords" content="maintenance urgente, depannage site internet, reparation bug php, site en panne, assistance prioritaire, sazulis">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org/",
+      "@type": "Product",
+      "name": "<?= htmlspecialchars($product['name']) ?>",
+      "image": "https://<?= $_SERVER['HTTP_HOST'] ?>/assets/img/urgente.png",
+      "description": "Intervention technique critique sous 24h pour résolution de pannes, correction de bugs bloquants et restauration de services web.",
+      "sku": "<?= htmlspecialchars($product['ref']) ?>",
+      "mpn": "<?= $product['id'] ?>",
+      "offers": {
+        "@type": "Offer",
+        "url": "https://<?= $_SERVER['HTTP_HOST'] ?><?= htmlspecialchars($_SERVER['REQUEST_URI']) ?>",
+        "priceCurrency": "EUR",
+        "price": "<?= $product['price'] ?>",
+        "priceValidUntil": "2027-12-31",
+        "itemCondition": "https://schema.org/NewCondition",
+        "availability": "https://schema.org/InStock"
+      }
+    }
+    </script>
+
+    <?php
+    $head_base = '../../';
+    include '../../head.php';
+    ?>
+    <style>
+    html, body, main, footer {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+    }
+    body {
+        background: url('../../assets/img/unique.png') center/cover no-repeat fixed;
+        font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    main {
+        background: transparent !important;
+        box-shadow: none !important;
+        border-radius: 0;
+        margin-bottom: 2em;
+    }
+    footer {
+        position: relative !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        min-width: 0 !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+        background-clip: padding-box !important;
+    }
+    .product-image {
+        max-width: 220px;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px #0001;
+        background: #fff;
+        height: auto;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    @media (max-width: 600px) {
+        .product-image {
+            width: 100%;
+            max-width: 200px;
+            height: auto;
+        }
+        main {
+            margin-bottom: 4em;
+        }
+        footer {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+    }
+    </style>
+</head>
+<body>
+<?php include '../../navbar.php'; ?>
+<main>
+    <section class="hero-clean" style="background: transparent;">
+        <div style="background: transparent; box-shadow: none; border-radius: 0; padding: 2.5em 0 2em 0; text-align: center;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+                <h1 class="hero-clean-title" style="background: transparent; font-size:2.2em; color:#e22a2a; font-weight:700; margin-bottom:0;">
+                    <?= htmlspecialchars($product['name']) ?>
+                </h1>
+                <div style="background:#ffe066;color:#222;padding:8px 28px;border-radius:16px;font-weight:700;display:inline-block;font-size:1.25em;letter-spacing:1px;box-shadow:0 2px 8px #ffe06633;">
+                    INTERVENTION CRITIQUE 24H
+                </div>
+            </div>
+            <div style="margin:1.5em auto 1em auto;">
+                <img src="<?= $product['img'] ?>" alt="<?= htmlspecialchars($product['name']) ?>" class="product-image">
+            </div>
+            <div class="hero-clean-desc" style="background: transparent; max-width:600px; margin:auto;">
+                Intervention rapide en cas de panne ou d’urgence, remise en ligne de votre site sous 24h.<br>
+                Maintenance d’urgence, diagnostic, correction de bugs et assistance prioritaire pour rétablir votre site au plus vite.
+            </div>
+        </div>
+    </section>
+
+    <section style="background:none; padding: 1em 0 0.5em 0; text-align:center;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:0.5em;">
+            <div style="display:flex;align-items:baseline;gap:1em;justify-content:center;flex-wrap:wrap;">
+                <span class="prix-normal" style="font-size:2em;font-weight:900;color:#e22a2a;background:linear-gradient(90deg,#ffe9c6,#fffbe6 80%,#ffd700);padding:0.2em 0.8em;border-radius:1em;box-shadow:0 1px 8px #ffd70033;">
+                    <?= number_format($product['price'], 2, ',', ' ') ?> € TTC
+                </span>
+            </div>
+            <form method="post" style="margin-top:0.5em;">
+                <input type="hidden" name="qty" value="1">
+                <button type="submit" name="add_to_cart" class="hero-clean-btn" style="background: transparent; color: #e22a2a; border: 1px solid #e22a2a; font-size:1.1em; padding:0.7em 2em; border-radius:8px; font-weight:700; cursor:pointer;">Ajouter au panier</button>
+            </form>
+        </div>
+        <div style="margin-top:1em;color:#2a7ae2;font-size:1rem;">Réf : <?= htmlspecialchars($product['ref']) ?></div>
+        <div style="margin-top:1em;display:flex;justify-content:center;gap:14px;align-items:center;">
+            <img src="../../assets/img/visa.png" alt="Visa" style="height:28px;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png" alt="Mastercard" style="height:28px;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" style="height:28px;">
+            <img src="../../assets/img/stripe.png" alt="Stripe" style="height:60px;">
+            <img src="../../assets/img/virement.png" alt="Virement bancaire" style="height:80px;">
+            <span style="color:#2a7ae2;font-weight:500;font-size:1rem;">Paiement 100% sécurisé</span>
+        </div>
+    </section>
+
+    <section style="background: none; padding: 2em 0 1em 0;">
+        <ul class="hero-devweb-list" style="display:flex;flex-wrap:wrap;justify-content:center;gap:2em;list-style:none;padding:0;margin:0 auto 0 auto;max-width:900px;">
+            <li>Diagnostic rapide</li>
+            <li>Correction de bugs</li>
+            <li>Assistance prioritaire</li>
+            <li>Remise en ligne sous 24h</li>
+        </ul>
+    </section>
+
+    <section style="max-width:700px;margin:2em auto 0;padding:20px;background:#f8f8f8;border-radius:10px;box-shadow:0 2px 8px #0001;">
+        <h3 style="margin-top:0;font-size:1.2em;color:#e22a2a;">Inclus dans le prix :</h3>
+        <table style="width:100%;border-collapse:collapse;background:#fffaf0;border:1px solid #ffe066;color:#2a7ae2;font-size:1em;border-radius:8px;overflow:hidden;">
+            <thead>
+                <tr style="background:#ffe066;color:#222;">
+                    <th style="padding:8px;border:1px solid #ffe066;text-align:left;">Service</th>
+                    <th style="padding:8px;border:1px solid #ffe066;text-align:right;">Détail inclus</th>
+                    <th style="padding:8px;border:1px solid #ffe066;text-align:right;">Prix inclus</th>
+                    <th style="padding:8px;border:1px solid #ffe066;text-align:right;">Tarif sans offre (1 intervention)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="background:#fffbe6;">
+                    <td style="padding:8px;border:1px solid #ffe066;">Maintenance urgente</td>
+                    <td style="padding:8px;border:1px solid #ffe066;">1 intervention</td>
+                    <td style="padding:8px;border:1px solid #ffe066;text-align:right;">200,00 €</td>
+                    <td style="padding:8px;border:1px solid #ffe066;text-align:right;">300,00 €</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px;border:1px solid #ffe066;">Diagnostic rapide</td>
+                    <td style="padding:8px;border:1px solid #ffe066;">Incluse</td>
+                    <td style="padding:8px;border:1px solid #ffe066;text-align:right;">0,00 €</td>
+                    <td style="padding:8px;border:1px solid #ffe066;text-align:right;">50,00 €</td>
+                </tr>
+                <tr style="background:#fffbe6;">
+                    <td style="padding:8px;border:1px solid #ffe066;">Support prioritaire</td>
+                    <td style="padding:8px;border:1px solid #ffe066;">Incluse</td>
+                    <td style="padding:8px;border:1px solid #ffe066;text-align:right;">0,00 €</td>
+                    <td style="padding:8px;border:1px solid #ffe066;text-align:right;">60,00 €</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr style="background:#ffe066;font-weight:bold;color:#222;">
+                    <td colspan="2" style="padding:8px;border:1px solid #ffe066;text-align:right;">Total inclus</td>
+                    <td style="padding:8px;border:1px solid #ffe066;text-align:right;">200,00 €</td>
+                    <td style="padding:8px;border:1px solid #ffe066;text-align:right;">410,00 €</td>
+                </tr>
+            </tfoot>
+        </table>
+        <div style="background:#fffaf0;border:1px solid #ffe066;border-radius:8px;padding:14px 18px;margin-top:14px;color:#2a7ae2;font-size:1em;text-align:left;">
+            Cette offre inclut la maintenance urgente, le diagnostic rapide et le support prioritaire. Le tarif “sans offre” correspond au prix standard si chaque service était acheté séparément. Idéal pour une remise en ligne rapide et sécurisée de votre site.
+        </div>
+    </section>
+
+    <section style="display:flex;flex-wrap:wrap;gap:12px;margin:2em auto 0;justify-content:center;background:#fffbe6;padding:18px 0;border-radius:12px;max-width:900px;">
+        <div style="background:linear-gradient(90deg,#ffe066,#ffb700);color:#222;padding:10px 18px;border-radius:8px;font-size:1rem;font-weight:500;box-shadow:0 2px 8px rgba(255,224,102,0.10);">Satisfait ou remboursé 30 jours</div>
+        <div style="background:linear-gradient(90deg,#ffe066,#ffb700);color:#222;padding:10px 18px;border-radius:8px;font-size:1rem;font-weight:500;box-shadow:0 2px 8px rgba(255,224,102,0.10);">Support client 7j/7</div>
+        <div style="background:linear-gradient(90deg,#ffe066,#ffb700);color:#222;padding:10px 18px;border-radius:8px;font-size:1rem;font-weight:500;box-shadow:0 2px 8px rgba(255,224,102,0.10);">Livraison digitale rapide</div>
+        <div style="background:linear-gradient(90deg,#ffe066,#ffb700);color:#222;padding:10px 18px;border-radius:8px;font-size:1rem;font-weight:500;box-shadow:0 2px 8px rgba(255,224,102,0.10);">Paiement sécurisé &amp; données protégées</div>
+    </section>
+
+    <section style="background:#eaf4ff;border-radius:18px;padding:2em 1.5em;box-shadow:0 4px 24px rgba(42,122,226,0.08);margin:2em auto 2em auto;max-width:900px;">
+        <h2 style="color:#2a7ae2;font-size:1.2em;font-weight:700;margin-bottom:12px;">Description détaillée</h2>
+        <p style="color:#222;font-size:1.05rem;line-height:1.6;">
+            Maintenance d’urgence, diagnostic, correction de bugs et assistance prioritaire pour rétablir votre site au plus vite.
+        </p>
+    </section>
+
+    <section style="background:#fffbe6;border-radius:18px;padding:2em 1.5em;box-shadow:0 4px 24px rgba(255,224,102,0.08);margin:2em auto 2em auto;max-width:900px;border:2px dashed #ffe066;">
+        <h3 style="color:#e22a2a;font-size:1.1em;font-weight:700;margin-bottom:12px;">Non inclus dans ce pack</h3>
+        <ul style="color:#e22a2a;font-size:1.05rem;line-height:1.6;list-style:disc inside;margin:0 0 0 18px;">
+            <li>Maintenance préventive</li>
+            <li>Développement de nouvelles fonctionnalités</li>
+        </ul>
+    </section>
+</main>
+<footer class="footer-modern" style="background:#fff;border-top:1px solid #eee;padding:2.2em 0 1.2em 0;text-align:center;margin-top:3em;width:100vw;max-width:100vw;overflow-x:hidden;">
+    <?php include '../../footer.php'; ?>
+</footer>
+</body>
+</html>

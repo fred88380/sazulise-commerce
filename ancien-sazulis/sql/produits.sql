@@ -1,0 +1,35 @@
+-- Insertion des produits avec prix exacts depuis les fichiers PHP
+INSERT INTO produits (slug, nom, prix, description, image) VALUES
+('application-web-html', 'Application Web HTML', 5015.13, 'Développement d''une application web en HTML'),
+('application-web-nextjs', 'Application Web Next.js', 6087.36, 'Développement d''une application web avec Next.js'),
+('e-commerce-html', 'E-commerce HTML', 6373.63, 'Site e-commerce en HTML'),
+('e-commerce-nextjs', 'E-commerce Next.js', 8299.00, 'Site e-commerce avec Next.js'),
+('hebergement-basic-html', 'Hébergement Basic HTML', 149.99, 'Hébergement basique pour site HTML'),
+('hebergement-basic-nextjs', 'Hébergement Basic Next.js', 299.99, 'Hébergement basique pour site Next.js'),
+('hebergement-business-html', 'Hébergement Business HTML', 289.99, 'Hébergement business pour site HTML'),
+('hebergement-business-nextjs', 'Hébergement Business Next.js', 579.98, 'Hébergement business pour site Next.js'),
+('hebergement-premium-html', 'Hébergement Premium HTML', 579.99, 'Hébergement premium pour site HTML'),
+('hebergement-premium-nextjs', 'Hébergement Premium Next.js', 1159.96, 'Hébergement premium pour site Next.js'),
+('maintenance-basic', 'Maintenance Basic', 350.00, 'Maintenance basique'),
+('maintenance-business', 'Maintenance Business', 650.00, 'Maintenance business'),
+('maintenance-premium', 'Maintenance Premium', 950.00, 'Maintenance premium'),
+('maintenance-urgente', 'Maintenance Urgente', 200.00, 'Maintenance urgente'),
+('refonte-site-html', 'Refonte Site HTML', 250.00, 'Refonte de site en HTML'),
+('refonte-site-nextjs', 'Refonte Site Next.js', 600.00, 'Refonte de site avec Next.js'),
+('seo-business', 'SEO Business', 459.98, 'Pack SEO business'),
+('seo-premium', 'SEO Premium', 599.99, 'Pack SEO premium'),
+('site-vitrine-html', 'Site Vitrine HTML', 4326.87, 'Site vitrine en HTML'),
+('site-vitrine-nextjs', 'Site Vitrine Next.js', 5399.10, 'Site vitrine avec Next.js'),
+('site-vitrine-pack-starter-html', 'Site Vitrine Pack Starter HTML', 1316.98, 'Pack starter site vitrine HTML', 'assets/img/vitrine-site.png'),
+('site-vitrine-pack-starter-nextjs', 'Site Vitrine Pack Starter Next.js', 2899.10, 'Pack starter site vitrine Next.js', 'assets/img/vitrine-site.png'),
+('wordpress-cms-html', 'WordPress CMS HTML', 3603.64, 'Site WordPress CMS HTML'),
+('wordpress-cms-nextjs', 'WordPress CMS Next.js', 4675.87, 'Site WordPress CMS Next.js');
+CREATE TABLE produits (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(150) NOT NULL,
+    description TEXT,
+    prix DECIMAL(10,2) NOT NULL,
+    categorie VARCHAR(50),
+    image VARCHAR(255),
+    date_ajout DATETIME DEFAULT CURRENT_TIMESTAMP
+);

@@ -1,0 +1,9 @@
+RewriteEngine On
+
+# Keep direct access to files/folders (including /public/assets)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Route all app URLs through root index.php
+RewriteRule ^ index.php [L,QSA]
