@@ -357,6 +357,42 @@ if (!$isInLayout) {
   margin-top: 14px;
 }
 
+.profile-signature-box {
+  margin-top: 14px;
+  border: 1px solid var(--p-line);
+  border-radius: 14px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.profile-signature-box p {
+  margin-bottom: 8px;
+}
+
+.profile-signature-canvas {
+  width: 100%;
+  height: 140px;
+  background: #fff;
+  border-radius: 10px;
+  cursor: crosshair;
+  display: block;
+}
+
+.profile-signature-preview {
+  max-width: 200px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 6px;
+  margin-top: 8px;
+}
+
+.profile-signature-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
 .profile-documents {
   display: grid;
   gap: 12px;
@@ -615,10 +651,12 @@ if (!$isInLayout) {
       <span class="profile-tag">DOWNLOADS</span>
     </div>
     <?php if ($latestOrderId !== ''): ?>
-      <p class="profile-document-note">Télécharge directement le contrat et la facture de ta dernière commande.</p>
+      <p class="profile-document-note">Télécharge ou visualise directement le contrat et la facture de ta dernière commande.</p>
       <div class="profile-document-row">
-        <a class="profile-btn profile-btn-ghost" href="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/contrats/contrat.php?order_id=<?= htmlspecialchars($latestOrderId, ENT_QUOTES, 'UTF-8') ?>">Télécharger le contrat</a>
-        <a class="profile-btn profile-btn-primary" href="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/factures/facture_pdf.php?order_id=<?= htmlspecialchars($latestOrderId, ENT_QUOTES, 'UTF-8') ?>">Télécharger la facture</a>
+        <a class="profile-btn profile-btn-ghost" href="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/profile/documents/<?= (int) $latestOrderId ?>/contract/preview">Aperçu contrat</a>
+        <a class="profile-btn profile-btn-ghost" href="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/profile/documents/<?= (int) $latestOrderId ?>/contract">Télécharger le contrat</a>
+        <a class="profile-btn profile-btn-ghost" href="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/profile/documents/<?= (int) $latestOrderId ?>/invoice/preview">Aperçu facture</a>
+        <a class="profile-btn profile-btn-primary" href="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/profile/documents/<?= (int) $latestOrderId ?>/invoice">Télécharger la facture</a>
       </div>
     <?php else: ?>
       <p class="profile-document-note">Aucun document disponible tant qu’aucune commande n’a été passée.</p>
@@ -642,6 +680,11 @@ if (!$isInLayout) {
         <?php
         $items = isset($order['items']) && is_array($order['items']) ? $order['items'] : [];
         $itemsCount = 0;
+        $orderId = (int) ($order['id'] ?? 0);
+        $acompte = (int) ($order['acompte_paye'] ?? 0) === 1;
+        $solde = (int) ($order['solde_regle'] ?? 0) === 1;
+        $signaturePath = (string) ($order['client_signature_path'] ?? '');
+        $hasSignature = $signaturePath !== '';
         foreach ($items as $item) {
             $itemsCount += (int) ($item['quantity'] ?? 0);
         }
@@ -650,14 +693,37 @@ if (!$isInLayout) {
           <div class="profile-badges">
             <span><?= htmlspecialchars($statusLabel((string) ($order['status'] ?? 'pending')), ENT_QUOTES, 'UTF-8') ?></span>
             <span><?= (int) $itemsCount ?> article(s)</span>
+            <span><?= $acompte ? 'Acompte valide' : 'Acompte en attente' ?></span>
+            <span><?= $solde ? 'Solde regle' : 'Solde en attente' ?></span>
+            <span><?= $hasSignature ? 'Document signe' : 'Signature requise' ?></span>
           </div>
           <h3>Commande <?= htmlspecialchars((string) ($order['order_ref'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
           <p>Date: <?= htmlspecialchars((string) ($order['created_at'] ?? ''), ENT_QUOTES, 'UTF-8') ?></p>
           <p>Total: <strong><?= number_format((float) ($order['total'] ?? 0), 2, ',', ' ') ?> EUR</strong></p>
           <div class="profile-actions profile-order-actions">
-            <a class="profile-btn profile-btn-ghost" href="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/contrats/contrat.php?order_id=<?= (int) ($order['id'] ?? 0) ?>">Télécharger le contrat</a>
-            <a class="profile-btn profile-btn-primary" href="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/factures/facture_pdf.php?order_id=<?= (int) ($order['id'] ?? 0) ?>">Télécharger la facture</a>
+            <a class="profile-btn profile-btn-ghost" href="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/profile/documents/<?= $orderId ?>/contract/preview">Aperçu contrat</a>
+            <a class="profile-btn profile-btn-ghost" href="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/profile/documents/<?= $orderId ?>/contract">Télécharger le contrat</a>
+            <a class="profile-btn profile-btn-ghost" href="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/profile/documents/<?= $orderId ?>/invoice/preview">Aperçu facture</a>
+            <a class="profile-btn profile-btn-primary" href="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/profile/documents/<?= $orderId ?>/invoice">Télécharger la facture</a>
           </div>
+
+          <div class="profile-signature-box">
+            <?php if ($hasSignature): ?>
+              <p>Signature client enregistree.</p>
+              <img class="profile-signature-preview" src="<?= htmlspecialchars($basePath . $signaturePath, ENT_QUOTES, 'UTF-8') ?>" alt="Signature client">
+            <?php else: ?>
+              <p>Signe en ligne ce document pour finaliser le contrat.</p>
+              <form method="post" action="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/profile/signature/<?= $orderId ?>" class="js-signature-form" data-order-id="<?= $orderId ?>">
+                <canvas class="profile-signature-canvas js-signature-canvas" width="540" height="140"></canvas>
+                <input type="hidden" name="signature_data" class="js-signature-input" value="">
+                <div class="profile-signature-actions">
+                  <button type="button" class="profile-btn profile-btn-ghost js-signature-clear">Effacer</button>
+                  <button type="submit" class="profile-btn profile-btn-primary">Enregistrer la signature</button>
+                </div>
+              </form>
+            <?php endif; ?>
+          </div>
+
           <?php if (!empty($items)): ?>
             <p>
               <?php
@@ -674,6 +740,74 @@ if (!$isInLayout) {
     </section>
   <?php endif; ?>
 </div>
+
+<script>
+document.querySelectorAll('.js-signature-form').forEach((form) => {
+  const canvas = form.querySelector('.js-signature-canvas');
+  const input = form.querySelector('.js-signature-input');
+  const clearBtn = form.querySelector('.js-signature-clear');
+  if (!canvas || !input || !clearBtn) {
+    return;
+  }
+
+  const context = canvas.getContext('2d');
+  let drawing = false;
+
+  const resetCanvas = () => {
+    context.fillStyle = '#ffffff';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.strokeStyle = '#111111';
+    context.lineWidth = 2;
+    context.lineCap = 'round';
+  };
+
+  const pointerPos = (event) => {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (event.clientX - rect.left) * (canvas.width / rect.width),
+      y: (event.clientY - rect.top) * (canvas.height / rect.height),
+    };
+  };
+
+  resetCanvas();
+
+  canvas.addEventListener('pointerdown', (event) => {
+    drawing = true;
+    const p = pointerPos(event);
+    context.beginPath();
+    context.moveTo(p.x, p.y);
+  });
+
+  canvas.addEventListener('pointermove', (event) => {
+    if (!drawing) {
+      return;
+    }
+    const p = pointerPos(event);
+    context.lineTo(p.x, p.y);
+    context.stroke();
+  });
+
+  const stopDrawing = () => {
+    drawing = false;
+  };
+
+  canvas.addEventListener('pointerup', stopDrawing);
+  canvas.addEventListener('pointerleave', stopDrawing);
+
+  clearBtn.addEventListener('click', () => {
+    resetCanvas();
+    input.value = '';
+  });
+
+  form.addEventListener('submit', (event) => {
+    input.value = canvas.toDataURL('image/png');
+    if (!input.value || input.value.length < 400) {
+      event.preventDefault();
+      alert('Merci de signer avant de valider.');
+    }
+  });
+});
+</script>
 
   <?php if (!$isInLayout): ?>
   </main>

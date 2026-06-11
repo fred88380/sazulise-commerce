@@ -32,6 +32,10 @@ CREATE TABLE IF NOT EXISTS orders (
   customer_address TEXT,
   total DECIMAL(10,2) NOT NULL,
   status VARCHAR(32) NOT NULL DEFAULT 'pending',
+  acompte_paye TINYINT(1) NOT NULL DEFAULT 0,
+  solde_regle TINYINT(1) NOT NULL DEFAULT 0,
+  client_signature_path VARCHAR(255) DEFAULT NULL,
+  client_signature_at DATETIME DEFAULT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );

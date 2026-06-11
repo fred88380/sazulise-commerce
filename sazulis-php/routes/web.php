@@ -15,7 +15,10 @@ return static function (Router $router): void {
     $router->get('/checkout', [ShopController::class, 'checkout']);
     $router->get('/profile', [ShopController::class, 'profile']);
     $router->get('/profile/documents/{orderId}/{type}', [ShopController::class, 'document']);
+    $router->get('/profile/documents/{orderId}/{type}/preview', [ShopController::class, 'documentPreview']);
+    $router->post('/profile/signature/{orderId}', [ShopController::class, 'saveSignature']);
     $router->get('/admin', [ShopController::class, 'admin']);
+    $router->post('/admin/orders/{orderId}/validate/{type}', [ShopController::class, 'validatePayment']);
 
     $router->get('/mentions-legales', [PageController::class, 'mentionsLegales']);
     $router->get('/apropos', [PageController::class, 'apropos']);
