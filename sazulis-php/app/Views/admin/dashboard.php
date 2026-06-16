@@ -12,6 +12,7 @@ $totalRevenue = isset($totalRevenue) ? (float) $totalRevenue : 0.0;
 $validatedAcompte = 0;
 $validatedSolde = 0;
 $pendingSignatures = 0;
+$allUnlimitedStock = !empty($products) && count(array_filter($products, static fn (array $product): bool => (bool) ($product['unlimited_stock'] ?? false))) === count($products);
 
 foreach ($orders as $order) {
     if ((int) ($order['acompte_paye'] ?? 0) === 1) {
@@ -434,9 +435,9 @@ foreach ($orders as $order) {
       <small>Statut paid/completed</small>
     </article>
     <article class="admin-kpi">
-      <span>Stock total</span>
-      <strong><?= $totalStock ?></strong>
-      <small>Unités disponibles</small>
+      <span>Stock</span>
+      <strong><?= $allUnlimitedStock ? 'Illimite' : $totalStock ?></strong>
+      <small><?= $allUnlimitedStock ? 'Disponibilite permanente' : 'Unites disponibles' ?></small>
     </article>
     <article class="admin-kpi">
       <span>Acomptes validés</span>
@@ -502,7 +503,7 @@ foreach ($orders as $order) {
               <tr>
                 <td><?= htmlspecialchars((string) ($product['name'] ?? ''), ENT_QUOTES, 'UTF-8') ?></td>
                 <td class="admin-amount"><?= number_format((float) ($product['price'] ?? 0), 2, ',', ' ') ?> EUR</td>
-                <td><?= (int) ($product['stock'] ?? 0) ?></td>
+                <td><?= (bool) ($product['unlimited_stock'] ?? false) ? 'Illimite' : (int) ($product['stock'] ?? 0) ?></td>
                 <td><?= htmlspecialchars((string) ($product['slug'] ?? ''), ENT_QUOTES, 'UTF-8') ?></td>
               </tr>
             <?php endforeach; ?>
@@ -569,10 +570,12 @@ foreach ($orders as $order) {
                   <div class="admin-actions">
                     <?php if (!$acompte): ?>
                       <form class="admin-action-form" method="post" action="<?= htmlspecialchars((string) ($basePath ?? ''), ENT_QUOTES, 'UTF-8') ?>/admin/orders/<?= $orderId ?>/validate/acompte">
+                        <input type="hidden" name="__csrf" value="<?= htmlspecialchars((string) ($csrfToken ?? ''), ENT_QUOTES, 'UTF-8') ?>">
                         <button type="submit" class="admin-action-btn">Valider acompte</button>
                       </form>
                     <?php else: ?>
                       <form class="admin-action-form" method="post" action="<?= htmlspecialchars((string) ($basePath ?? ''), ENT_QUOTES, 'UTF-8') ?>/admin/orders/<?= $orderId ?>/validate/acompte">
+                        <input type="hidden" name="__csrf" value="<?= htmlspecialchars((string) ($csrfToken ?? ''), ENT_QUOTES, 'UTF-8') ?>">
                         <input type="hidden" name="state" value="0">
                         <button type="submit" class="admin-action-btn danger">Retirer acompte</button>
                       </form>
@@ -580,10 +583,12 @@ foreach ($orders as $order) {
 
                     <?php if (!$solde): ?>
                       <form class="admin-action-form" method="post" action="<?= htmlspecialchars((string) ($basePath ?? ''), ENT_QUOTES, 'UTF-8') ?>/admin/orders/<?= $orderId ?>/validate/solde">
+                        <input type="hidden" name="__csrf" value="<?= htmlspecialchars((string) ($csrfToken ?? ''), ENT_QUOTES, 'UTF-8') ?>">
                         <button type="submit" class="admin-action-btn alt">Valider solde</button>
                       </form>
                     <?php else: ?>
                       <form class="admin-action-form" method="post" action="<?= htmlspecialchars((string) ($basePath ?? ''), ENT_QUOTES, 'UTF-8') ?>/admin/orders/<?= $orderId ?>/validate/solde">
+                        <input type="hidden" name="__csrf" value="<?= htmlspecialchars((string) ($csrfToken ?? ''), ENT_QUOTES, 'UTF-8') ?>">
                         <input type="hidden" name="state" value="0">
                         <button type="submit" class="admin-action-btn danger">Retirer solde</button>
                       </form>
@@ -598,7 +603,94 @@ foreach ($orders as $order) {
       </div>
     </article>
   </section>
+
+  <section class="admin-panel" id="prospection-panel">
+    <header class="admin-panel-head">
+      <h2>&#128270; Prospection — Traqueur de sites obsolètes</h2>
+      <span>Trouve des clients en ciblant les sites à refondre</span>
+    </header>
+    <div style="padding:1.2rem;display:grid;gap:1rem;">
+
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;">
+        <input id="p-secteur" type="text" placeholder="Métier (ex: Menuiserie, Plombier, Garage…)" style="flex:1;min-width:200px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);color:#e8f2fb;border-radius:10px;padding:.6rem .9rem;font-size:.88rem;outline:none;">
+        <input id="p-ville" type="text" placeholder="Département ou ville (ex: 88, Lyon)" style="width:220px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);color:#e8f2fb;border-radius:10px;padding:.6rem .9rem;font-size:.88rem;outline:none;">
+        <button onclick="pScan()" style="background:#dc2626;color:#fff;border:none;border-radius:10px;padding:.65rem 1.3rem;font-weight:800;font-size:.88rem;cursor:pointer;">&#9876; Scanner</button>
+        <a href="<?= htmlspecialchars($basePath ?? '', ENT_QUOTES, 'UTF-8') ?>/scraper.php" target="_blank" style="background:rgba(122,211,255,0.18);color:#7ad3ff;border:1px solid rgba(122,211,255,0.3);border-radius:10px;padding:.65rem 1.1rem;font-weight:700;font-size:.85rem;text-decoration:none;">&#8599; Vue plein écran</a>
+      </div>
+
+      <div id="p-status" style="display:none;padding:1rem;text-align:center;color:rgba(255,255,255,0.5);font-size:.88rem;"></div>
+
+      <div id="p-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:.9rem;"></div>
+    </div>
+  </section>
+
 </div>
+
+<script>
+(function() {
+  var PROXY = (window.SAZULIS_BASE || '') + '/proxy-ia.php';
+
+  window.pScan = async function() {
+    var secteur = document.getElementById('p-secteur').value.trim();
+    var ville   = document.getElementById('p-ville').value.trim();
+    if (!secteur || !ville) { alert('Renseignez un métier et une zone.'); return; }
+
+    var status = document.getElementById('p-status');
+    var grid   = document.getElementById('p-grid');
+    status.style.display = 'block';
+    status.textContent   = '&#128270; Analyse en cours…';
+    grid.innerHTML       = '';
+
+    var fd = new FormData();
+    fd.append('action', 'scraper_auto');
+    fd.append('secteur', secteur);
+    fd.append('ville', ville);
+    fd.append('limit', '15');
+
+    try {
+      var res  = await fetch(PROXY, { method: 'POST', body: fd });
+      var data = await res.json();
+      status.style.display = 'none';
+
+      if (!data.ok || !data.results || !data.results.length) {
+        grid.innerHTML = '<p style="color:#fbbf24;padding:.5rem">⚠ ' + (data.error || 'Aucun résultat. Change les critères.') + '</p>';
+        return;
+      }
+
+      data.results.forEach(function(p) {
+        var email1 = (p.emails && p.emails.length) ? p.emails[0] : '';
+        var scoreColor = p.score >= 60 ? '#f87171' : '#fbbf24';
+        var card = document.createElement('div');
+        card.style.cssText = 'background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:1rem;transition:border-color .2s;';
+        card.innerHTML =
+          '<div style="font-size:.72rem;font-weight:800;color:' + scoreColor + ';text-transform:uppercase;margin-bottom:.5rem;">Score ' + p.score + '/100</div>' +
+          '<div style="font-weight:800;margin-bottom:.15rem;">' + p.nom + '</div>' +
+          '<div style="font-size:.78rem;color:rgba(255,255,255,.45);margin-bottom:.7rem;">' + (p.zone||'') + ' — ' + (p.plateforme||'') + '</div>' +
+          '<div style="font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:.3rem;">&#128279; <a href="' + p.url + '" target="_blank" style="color:#60a5fa;">' + p.url + '</a></div>' +
+          '<div style="font-size:.78rem;color:#fbbf24;font-weight:700;margin-bottom:.85rem;">&#128140; ' + (email1 || 'Email non trouvé') + '</div>' +
+          '<div style="display:flex;gap:.5rem;">' +
+          (email1 ? '<a href="mailto:' + email1 + '?subject=Modernisation%20de%20votre%20site" style="flex:1;text-align:center;background:rgba(122,211,255,.18);color:#7ad3ff;border-radius:8px;padding:.45rem .5rem;font-size:.78rem;font-weight:700;text-decoration:none;">&#9993; Démarcher</a>' : '<span style="flex:1;text-align:center;opacity:.3;font-size:.78rem;padding:.45rem 0;">Pas d\'email</span>') +
+          '<button onclick="pBlacklist(\'' + email1 + '\',this)" style="background:rgba(243,125,125,.18);color:#f87171;border:none;border-radius:8px;padding:.45rem .7rem;font-size:.78rem;font-weight:700;cursor:pointer;" ' + (email1?'':'disabled') + '>&#128683;</button>' +
+          '</div>';
+        grid.appendChild(card);
+      });
+    } catch(e) {
+      status.style.display = 'block';
+      status.textContent = 'Erreur réseau : ' + e.message;
+    }
+  };
+
+  window.pBlacklist = async function(email, btn) {
+    if (!email) return;
+    var fd = new FormData();
+    fd.append('action', 'blacklist_email');
+    fd.append('email', email);
+    var res  = await fetch(PROXY, { method: 'POST', body: fd });
+    var data = await res.json();
+    if (data.ok) { btn.textContent = '✓'; btn.disabled = true; btn.style.opacity = '.4'; }
+  };
+})();
+</script>
 
 <script>
 (function () {

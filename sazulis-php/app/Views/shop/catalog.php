@@ -17,6 +17,49 @@ ksort($badgeOptions, SORT_NATURAL | SORT_FLAG_CASE);
     <p>Selection curatee. Pieces premium. Delivery intelligente.</p>
 </section>
 
+<section class="catalog-info-grid">
+    <div class="catalog-info-block">
+        <h2>HTML ou Next.js&nbsp;: quelle difference&nbsp;?</h2>
+        <div class="catalog-info-row">
+            <div class="catalog-info-card">
+                <span class="catalog-info-badge">HTML</span>
+                <h3>Technologie traditionnelle</h3>
+                <p>Un site HTML est construit avec les langages de base du web&nbsp;: HTML, CSS et JavaScript. Les pages sont generees cote serveur ou livrees en fichiers statiques. C'est une solution eprouvee, simple a maintenir, compatible partout et tres rapide a charger sur tout type de connexion.</p>
+                <ul>
+                    <li>Ideal pour les sites vitrines simples ou les boutiques standard</li>
+                    <li>Hebergement facile et peu couteux</li>
+                    <li>Temps de chargement rapide</li>
+                    <li>Maintenance accessible</li>
+                </ul>
+            </div>
+            <div class="catalog-info-card">
+                <span class="catalog-info-badge catalog-info-badge-next">Next.js</span>
+                <h3>Technologie moderne React</h3>
+                <p>Next.js est un framework JavaScript haut de gamme base sur React. Il permet de creer des applications web ultra-performantes avec rendu hybride (serveur + navigateur), ideal pour les sites complexes, les boutiques a fort trafic et les applications metier. Les pages se chargent en une fraction de seconde grace au prefetching automatique.</p>
+                <ul>
+                    <li>Performances maximales et SEO natif optimise</li>
+                    <li>Ideal pour les e-commerces, applications et projets ambitieux</li>
+                    <li>Interface tres reactive, experience utilisateur premium</li>
+                    <li>Architecture evolutive pour grandir avec votre activite</li>
+                </ul>
+            </div>
+        </div>
+        <p class="catalog-info-note">En resume&nbsp;: HTML convient parfaitement pour demarrer ou pour un projet sobre et efficace. Next.js est le choix des projets qui veulent viser haut des le depart. Dans les deux cas, Sazulis vous livre un site professionnel, pret a l'emploi.</p>
+    </div>
+
+    <div class="catalog-info-block catalog-info-block-ownership">
+        <span class="catalog-info-badge catalog-info-badge-owner">Votre propriete</span>
+        <h2>Le site vous appartient entierement</h2>
+        <p>Pour toutes les prestations de creation de <strong>site vitrine</strong>, <strong>application web</strong>, <strong>e-commerce</strong> et <strong>site WordPress CMS</strong>, le site livre est votre propriete exclusive des le paiement integral. Vous recevez les codes source, les acces hebergement et le nom de domaine. Sazulis n'a aucun droit de regard ni de controle sur votre site une fois livre.</p>
+        <ul class="catalog-info-ownership-list">
+            <li>Code source livre integralement</li>
+            <li>Acces hebergement et domaine transferes a votre nom</li>
+            <li>Aucun abonnement oblige, aucune dependance envers Sazulis</li>
+            <li>Liberte totale de faire evoluer votre site comme vous le souhaitez</li>
+        </ul>
+    </div>
+</section>
+
 <section class="catalog-controls" aria-label="Filtres du catalogue">
     <label>
         Categorie

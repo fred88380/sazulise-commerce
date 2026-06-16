@@ -357,6 +357,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   <div class="audit-card">
     <form class="audit-form" method="post" action="">
+            <input type="hidden" name="__csrf" value="<?= h((string) ($csrfToken ?? '')) ?>">
       <input type="hidden" name="csrf_token" value="<?= h((string) $_SESSION['csrf_token']) ?>">
       <input type="text" name="site" placeholder="URL a auditer (ex: https://monsite.com)" required value="<?= isset($_POST['site']) ? h((string) $_POST['site']) : '' ?>">
       <label><input type="checkbox" name="fullsite" value="1" <?= !empty($_POST['fullsite']) ? 'checked' : '' ?>> Auditer toutes les pages du site (via sitemap)</label>

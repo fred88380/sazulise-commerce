@@ -5,6 +5,10 @@ $basePath = isset($basePath) ? (string) $basePath : '';
 
 $customerName = (string) ($user['name'] ?? 'Client');
 $customerEmail = (string) ($user['email'] ?? '');
+$twofaEnabled = isset($twofaEnabled) ? (bool) $twofaEnabled : ((int) ($user['totp_enabled'] ?? 0) === 1);
+$profileNotice = isset($profileNotice) ? (string) $profileNotice : '';
+$profileError = isset($profileError) ? (string) $profileError : '';
+$csrfToken = isset($csrfToken) ? (string) $csrfToken : (string) ($_SESSION['__csrf_token'] ?? '');
 $orderCount = count($orders);
 $totalSpent = 0.0;
 $latestOrderDate = null;
@@ -59,6 +63,14 @@ if (!$isInLayout) {
     session_start();
   }
 
+  if ($csrfToken === '') {
+    $csrfToken = (string) ($_SESSION['__csrf_token'] ?? '');
+    if ($csrfToken === '') {
+      $csrfToken = bin2hex(random_bytes(32));
+      $_SESSION['__csrf_token'] = $csrfToken;
+    }
+  }
+
   $runtimeBasePath = str_replace('\\', '/', dirname((string) ($_SERVER['SCRIPT_NAME'] ?? '')));
   $runtimeBasePath = ($runtimeBasePath === '.' || $runtimeBasePath === '/') ? '' : rtrim($runtimeBasePath, '/');
   $runtimeBasePath = (string) preg_replace('#/(?:public|index\.php)$#', '', $runtimeBasePath);
@@ -111,11 +123,16 @@ if (!$isInLayout) {
     <?php if ($layoutRole === 'admin'): ?>
       <a href="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/admin">Administration</a>
       <form method="post" action="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/logout" class="topbar-inline-form">
+        <input type="hidden" name="__csrf" value="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8') ?>">
         <button class="topbar-nav-btn is-danger" type="submit">Deconnexion</button>
       </form>
     <?php elseif ($layoutRole === 'client'): ?>
       <a href="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/profile">Profil</a>
+      <span class="topbar-2fa-badge <?= $twofaEnabled ? 'is-on' : 'is-off' ?>">
+        <?= $twofaEnabled ? '2FA activee' : '2FA inactive' ?>
+      </span>
       <form method="post" action="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/logout" class="topbar-inline-form">
+        <input type="hidden" name="__csrf" value="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8') ?>">
         <button class="topbar-nav-btn is-danger" type="submit">Deconnexion</button>
       </form>
     <?php else: ?>
@@ -232,6 +249,27 @@ if (!$isInLayout) {
 }
 
 .profile-fallback .topbar-nav-btn.is-danger { color: #d9534f; }
+
+.profile-fallback .topbar-2fa-badge {
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border: 1px solid;
+}
+
+.profile-fallback .topbar-2fa-badge.is-on {
+  color: #0f5f3e;
+  border-color: rgba(32, 173, 114, 0.35);
+  background: rgba(32, 173, 114, 0.15);
+}
+
+.profile-fallback .topbar-2fa-badge.is-off {
+  color: #8a5a18;
+  border-color: rgba(210, 160, 70, 0.45);
+  background: rgba(210, 160, 70, 0.16);
+}
 
 .profile-fallback .footer-modern {
   margin-top: auto;
@@ -494,6 +532,71 @@ if (!$isInLayout) {
   padding-bottom: 0;
 }
 
+.profile-2fa-card {
+  border-color: rgba(255, 207, 64, 0.36);
+}
+
+.profile-2fa-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 207, 64, 0.42);
+  background: rgba(255, 207, 64, 0.12);
+  color: #ffe9a8;
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.profile-2fa-status.is-active {
+  border-color: rgba(85, 209, 153, 0.45);
+  background: rgba(85, 209, 153, 0.14);
+  color: #bff5dd;
+}
+
+.profile-2fa-note {
+  font-size: 0.85rem;
+  color: #c5d7e7;
+  margin-top: 8px;
+}
+
+.profile-flash {
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border: 1px solid;
+  font-size: 0.88rem;
+}
+
+.profile-flash.ok {
+  color: #bff5dd;
+  border-color: rgba(85, 209, 153, 0.45);
+  background: rgba(85, 209, 153, 0.12);
+}
+
+.profile-flash.error {
+  color: #ffd0d0;
+  border-color: rgba(243, 125, 125, 0.45);
+  background: rgba(243, 125, 125, 0.12);
+}
+
+.profile-2fa-form {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.profile-2fa-form input {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--p-line);
+  background: rgba(8, 17, 27, 0.92);
+  color: var(--p-text);
+  padding: 10px 12px;
+}
+
 .profile-section-head {
   display: flex;
   justify-content: space-between;
@@ -583,6 +686,13 @@ if (!$isInLayout) {
 </style>
 
 <div class="profile-page">
+  <?php if ($profileNotice !== ''): ?>
+    <div class="profile-flash ok"><?= htmlspecialchars($profileNotice, ENT_QUOTES, 'UTF-8') ?></div>
+  <?php endif; ?>
+  <?php if ($profileError !== ''): ?>
+    <div class="profile-flash error"><?= htmlspecialchars($profileError, ENT_QUOTES, 'UTF-8') ?></div>
+  <?php endif; ?>
+
   <section class="profile-hero">
     <article class="profile-card">
       <p class="profile-tag">CLIENT DASHBOARD</p>
@@ -642,6 +752,30 @@ if (!$isInLayout) {
       <div class="profile-actions">
         <a class="profile-btn profile-btn-ghost" href="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/contact">Ouvrir le support</a>
       </div>
+    </article>
+
+    <article class="profile-card profile-2fa-card">
+      <h3>Securite du compte</h3>
+      <p class="profile-2fa-status <?= $twofaEnabled ? 'is-active' : '' ?>">
+        <?= $twofaEnabled ? '2FA activee' : '2FA inactive' ?>
+      </p>
+      <?php if ($twofaEnabled): ?>
+        <p>Ton compte est protege par la double authentification. Un code temporaire est demande a chaque connexion.</p>
+        <form method="post" action="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/2fa/disable" class="profile-2fa-form">
+          <input type="hidden" name="__csrf" value="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8') ?>">
+          <label>Mot de passe actuel (requis pour desactiver)
+            <input type="password" name="current_password" required>
+          </label>
+          <button class="profile-btn profile-btn-ghost" type="submit">Desactiver la 2FA</button>
+        </form>
+        <p class="profile-2fa-note">Si tu changes de telephone, reconfigure la 2FA pour conserver l'acces.</p>
+      <?php else: ?>
+        <p>Tu peux activer la double authentification maintenant pour renforcer la protection de ton compte.</p>
+        <div class="profile-actions">
+          <a class="profile-btn profile-btn-primary" href="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/2fa/setup?origin=profile">Activer la 2FA</a>
+        </div>
+        <p class="profile-2fa-note">Recommande: active la 2FA pour eviter les connexions non autorisees.</p>
+      <?php endif; ?>
     </article>
   </section>
 
@@ -714,6 +848,7 @@ if (!$isInLayout) {
             <?php else: ?>
               <p>Signe en ligne ce document pour finaliser le contrat.</p>
               <form method="post" action="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/profile/signature/<?= $orderId ?>" class="js-signature-form" data-order-id="<?= $orderId ?>">
+                <input type="hidden" name="__csrf" value="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8') ?>">
                 <canvas class="profile-signature-canvas js-signature-canvas" width="540" height="140"></canvas>
                 <input type="hidden" name="signature_data" class="js-signature-input" value="">
                 <div class="profile-signature-actions">
@@ -836,6 +971,7 @@ document.querySelectorAll('.js-signature-form').forEach((form) => {
   </footer>
   <script>window.SAZULIS_BASE = '<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>';</script>
   <script>window.SAZULIS_USER = <?= $layoutUser ? json_encode($layoutUser, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : 'null' ?>;</script>
+  <script>window.SAZULIS_CSRF = '<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8') ?>';</script>
   <script src="<?= htmlspecialchars($assetsBasePath, ENT_QUOTES, 'UTF-8') ?>/assets/js/app.js" defer></script>
   </body>
   </html>

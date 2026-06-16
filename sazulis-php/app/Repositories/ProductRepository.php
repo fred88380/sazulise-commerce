@@ -15,7 +15,7 @@ final class ProductRepository
             $stmt = $pdo->query('SELECT id, slug, name, description, price, image, featured, badges, stock FROM products ORDER BY featured DESC, id DESC');
             $items = $stmt->fetchAll();
             if (!empty($items)) {
-                return array_map([$this, 'normalize'], $items);
+                return array_map(fn (array $item): array => $this->enrich($this->normalize($item)), $items);
             }
         }
 
@@ -30,6 +30,7 @@ final class ProductRepository
                 return $product;
             }
         }
+
         return null;
     }
 
@@ -45,287 +46,147 @@ final class ProductRepository
             'featured' => (bool) ($row['featured'] ?? false),
             'badges' => is_string($row['badges'] ?? null) ? array_filter(array_map('trim', explode(',', $row['badges']))) : [],
             'stock' => (int) ($row['stock'] ?? 10),
+            'unlimited_stock' => true,
         ];
     }
 
     private function seed(): array
     {
-        return [
-            [
-                'id' => 1,
-                'slug' => 'application-web-html',
-                'name' => 'Application Web HTML',
-                'description' => 'Developpement d\'une application web en HTML.',
-                'price' => 5015.13,
-                'image' => '/assets/img/application-web.png',
-                'featured' => true,
-                'badges' => ['Dev Web'],
-                'stock' => 10,
-            ],
-            [
-                'id' => 2,
-                'slug' => 'application-web-nextjs',
-                'name' => 'Application Web Next.js',
-                'description' => 'Developpement d\'une application web avec Next.js.',
-                'price' => 6087.36,
-                'image' => '/assets/img/application-web.png',
-                'featured' => true,
-                'badges' => ['Dev Web'],
-                'stock' => 10,
-            ],
-            [
-                'id' => 3,
-                'slug' => 'e-commerce-html',
-                'name' => 'E-commerce HTML',
-                'description' => 'Site e-commerce en HTML.',
-                'price' => 6373.63,
-                'image' => '/assets/img/e-commerce2.png',
-                'featured' => true,
-                'badges' => ['E-commerce'],
-                'stock' => 10,
-            ],
-            [
-                'id' => 4,
-                'slug' => 'e-commerce-nextjs',
-                'name' => 'E-commerce Next.js',
-                'description' => 'Site e-commerce avec Next.js.',
-                'price' => 8299.00,
-                'image' => '/assets/img/e-commerce2.png',
-                'featured' => true,
-                'badges' => ['E-commerce', 'Top Vente'],
-                'stock' => 10,
-            ],
-            [
-                'id' => 5,
-                'slug' => 'hebergement-basic-html',
-                'name' => 'Hébergement Basic HTML',
-                'description' => 'Hebergement basique pour site HTML.',
-                'price' => 149.99,
-                'image' => '/assets/img/hebergement.jpg',
-                'featured' => false,
-                'badges' => ['Hebergement'],
-                'stock' => 50,
-            ],
-            [
-                'id' => 6,
-                'slug' => 'hebergement-basic-nextjs',
-                'name' => 'Hébergement Basic Next.js',
-                'description' => 'Hebergement basique pour site Next.js.',
-                'price' => 299.99,
-                'image' => '/assets/img/hebergement.jpg',
-                'featured' => false,
-                'badges' => ['Hebergement'],
-                'stock' => 50,
-            ],
-            [
-                'id' => 7,
-                'slug' => 'hebergement-business-html',
-                'name' => 'Hébergement Business HTML',
-                'description' => 'Hebergement business pour site HTML.',
-                'price' => 289.99,
-                'image' => '/assets/img/hebergement.jpg',
-                'featured' => false,
-                'badges' => ['Hebergement'],
-                'stock' => 50,
-            ],
-            [
-                'id' => 8,
-                'slug' => 'hebergement-business-nextjs',
-                'name' => 'Hébergement Business Next.js',
-                'description' => 'Hebergement business pour site Next.js.',
-                'price' => 579.98,
-                'image' => '/assets/img/hebergement.jpg',
-                'featured' => false,
-                'badges' => ['Hebergement'],
-                'stock' => 50,
-            ],
-            [
-                'id' => 9,
-                'slug' => 'hebergement-premium-html',
-                'name' => 'Hébergement Premium HTML',
-                'description' => 'Hebergement premium pour site HTML.',
-                'price' => 579.99,
-                'image' => '/assets/img/hebergement.jpg',
-                'featured' => false,
-                'badges' => ['Hebergement', 'Premium'],
-                'stock' => 50,
-            ],
-            [
-                'id' => 10,
-                'slug' => 'hebergement-premium-nextjs',
-                'name' => 'Hébergement Premium Next.js',
-                'description' => 'Hebergement premium pour site Next.js.',
-                'price' => 1159.96,
-                'image' => '/assets/img/hebergement.jpg',
-                'featured' => false,
-                'badges' => ['Hebergement', 'Premium'],
-                'stock' => 50,
-            ],
-            [
-                'id' => 11,
-                'slug' => 'maintenance-basic',
-                'name' => 'Maintenance Basic',
-                'description' => 'Maintenance basique.',
-                'price' => 350.00,
-                'image' => '/assets/img/maintenance.jpg',
-                'featured' => false,
-                'badges' => ['Maintenance'],
-                'stock' => 100,
-            ],
-            [
-                'id' => 12,
-                'slug' => 'maintenance-business',
-                'name' => 'Maintenance Business',
-                'description' => 'Maintenance business.',
-                'price' => 650.00,
-                'image' => '/assets/img/maintenance.jpg',
-                'featured' => false,
-                'badges' => ['Maintenance'],
-                'stock' => 100,
-            ],
-            [
-                'id' => 13,
-                'slug' => 'maintenance-premium',
-                'name' => 'Maintenance Premium',
-                'description' => 'Maintenance premium.',
-                'price' => 950.00,
-                'image' => '/assets/img/maintenance.jpg',
-                'featured' => false,
-                'badges' => ['Maintenance', 'Premium'],
-                'stock' => 100,
-            ],
-            [
-                'id' => 14,
-                'slug' => 'maintenance-urgente',
-                'name' => 'Maintenance Urgente',
-                'description' => 'Maintenance urgente.',
-                'price' => 200.00,
-                'image' => '/assets/img/urgente.png',
-                'featured' => false,
-                'badges' => ['Maintenance'],
-                'stock' => 100,
-            ],
-            [
-                'id' => 15,
-                'slug' => 'refonte-site-html',
-                'name' => 'Refonte site HTML',
-                'description' => 'Refonte de site en HTML.',
-                'price' => 250.00,
-                'image' => '/assets/img/refonte-site-internet.jpg',
-                'featured' => false,
-                'badges' => ['Refonte'],
-                'stock' => 25,
-            ],
-            [
-                'id' => 16,
-                'slug' => 'refonte-site-nextjs',
-                'name' => 'Refonte site Next.js',
-                'description' => 'Refonte de site avec Next.js.',
-                'price' => 600.00,
-                'image' => '/assets/img/refonte-site-internet.jpg',
-                'featured' => false,
-                'badges' => ['Refonte'],
-                'stock' => 25,
-            ],
-            [
-                'id' => 17,
-                'slug' => 'seo-basic',
-                'name' => 'SEO Basic',
-                'description' => 'Pack SEO basic pour ameliorer la visibilite Google.',
-                'price' => 299.99,
-                'image' => '/assets/img/seo.png',
-                'featured' => false,
-                'badges' => ['SEO'],
-                'stock' => 100,
-            ],
-            [
-                'id' => 18,
-                'slug' => 'seo-business',
-                'name' => 'SEO Business',
-                'description' => 'Pack SEO business.',
-                'price' => 459.98,
-                'image' => '/assets/img/seo.png',
-                'featured' => false,
-                'badges' => ['SEO'],
-                'stock' => 100,
-            ],
-            [
-                'id' => 19,
-                'slug' => 'seo-premium',
-                'name' => 'SEO Premium',
-                'description' => 'Pack SEO premium.',
-                'price' => 599.99,
-                'image' => '/assets/img/seo.png',
-                'featured' => false,
-                'badges' => ['SEO', 'Premium'],
-                'stock' => 100,
-            ],
-            [
-                'id' => 20,
-                'slug' => 'site-vitrine-html',
-                'name' => 'Site vitrine HTML',
-                'description' => 'Site vitrine en HTML.',
-                'price' => 4326.87,
-                'image' => '/assets/img/site-vitrine.png',
-                'featured' => true,
-                'badges' => ['Site Vitrine'],
-                'stock' => 12,
-            ],
-            [
-                'id' => 21,
-                'slug' => 'site-vitrine-nextjs',
-                'name' => 'Site vitrine Next.js',
-                'description' => 'Site vitrine avec Next.js.',
-                'price' => 5399.10,
-                'image' => '/assets/img/site-vitrine.png',
-                'featured' => true,
-                'badges' => ['Site Vitrine', 'Top Vente'],
-                'stock' => 12,
-            ],
-            [
-                'id' => 22,
-                'slug' => 'site-vitrine-pack-starter-html',
-                'name' => 'Site vitrine pack-starter HTML',
-                'description' => 'Pack starter site vitrine HTML.',
-                'price' => 1316.98,
-                'image' => '/assets/img/vitrine-site.png',
-                'featured' => false,
-                'badges' => ['Site Vitrine'],
-                'stock' => 15,
-            ],
-            [
-                'id' => 23,
-                'slug' => 'site-vitrine-pack-starter-nextjs',
-                'name' => 'Site vitrine pack-starter Next.js',
-                'description' => 'Pack starter site vitrine Next.js.',
-                'price' => 2899.10,
-                'image' => '/assets/img/vitrine-site.png',
-                'featured' => false,
-                'badges' => ['Site Vitrine'],
-                'stock' => 15,
-            ],
-            [
-                'id' => 24,
-                'slug' => 'wordpress-cms-html',
-                'name' => 'WordPress CMS HTML',
-                'description' => 'Site WordPress CMS HTML.',
-                'price' => 3603.64,
-                'image' => '/assets/img/wordpress.jpg',
-                'featured' => false,
-                'badges' => ['WordPress'],
-                'stock' => 10,
-            ],
-            [
-                'id' => 25,
-                'slug' => 'wordpress-cms-nextjs',
-                'name' => 'WordPress CMS Next.js',
-                'description' => 'Site WordPress CMS Next.js.',
-                'price' => 4675.87,
-                'image' => '/assets/img/wordpress.jpg',
-                'featured' => false,
-                'badges' => ['WordPress'],
-                'stock' => 10,
-            ],
+        $items = require __DIR__ . '/../Data/productCatalog.php';
+        return array_map(fn (array $item): array => $this->enrich($item), $items);
+    }
+
+    private function enrich(array $product): array
+    {
+        $product['unlimited_stock'] = (bool) ($product['unlimited_stock'] ?? true);
+
+        $slug = (string) ($product['slug'] ?? '');
+        $family = $this->detectFamily($slug);
+        $stack = str_contains($slug, 'nextjs') ? 'Next.js' : 'HTML';
+        $tier = $this->detectTier($slug);
+
+        if (empty($product['long_description'])) {
+            $product['long_description'] = $this->buildLongDescription($family, $stack, $tier);
+        }
+
+        if (empty($product['highlights']) || !is_array($product['highlights'])) {
+            $product['highlights'] = $this->buildHighlights($family, $stack, $tier);
+        }
+
+        if (empty($product['included']) || !is_array($product['included'])) {
+            $product['included'] = $this->buildIncluded($family, $stack, $tier);
+        }
+
+        if (empty($product['not_included']) || !is_array($product['not_included'])) {
+            $product['not_included'] = [
+                'Creation de contenu texte illimite',
+                'Campagnes publicitaires payantes (SEA)',
+                'Interventions hors perimetre du pack',
+            ];
+        }
+
+        return $product;
+    }
+
+    private function detectFamily(string $slug): string
+    {
+        foreach ([
+            'application-web' => 'application-web',
+            'e-commerce' => 'e-commerce',
+            'hebergement' => 'hebergement',
+            'maintenance' => 'maintenance',
+            'refonte-site' => 'refonte-site',
+            'seo' => 'seo',
+            'site-vitrine' => 'site-vitrine',
+            'wordpress-cms' => 'wordpress-cms',
+        ] as $needle => $family) {
+            if (str_starts_with($slug, $needle)) {
+                return $family;
+            }
+        }
+
+        return 'generic';
+    }
+
+    private function detectTier(string $slug): string
+    {
+        foreach (['starter', 'basic', 'business', 'premium', 'urgente'] as $tier) {
+            if (str_contains($slug, $tier)) {
+                return $tier;
+            }
+        }
+
+        return 'standard';
+    }
+
+    private function buildLongDescription(string $family, string $stack, string $tier): string
+    {
+        return match ($family) {
+            'site-vitrine' => "Ce pack {$stack} est concu pour presenter votre entreprise avec une image premium, un chargement rapide et une structure claire pour convertir vos visiteurs en demandes de contact.",
+            'application-web' => "Cette prestation {$stack} permet de construire une application metier stable et evolutive, avec un parcours utilisateur fluide et un socle technique propre pour vos evolutions futures.",
+            'e-commerce' => "Cette solution e-commerce {$stack} est orientee conversion: fiches produits performantes, tunnel d'achat simple et architecture optimisee pour encaisser la croissance de votre catalogue.",
+            'wordpress-cms' => "Cette offre combine un back-office WordPress simple a prendre en main avec un front {$stack} moderne, pour publier vite tout en conservant de bonnes performances.",
+            'seo' => "Ce pack SEO {$tier} vise a renforcer votre visibilite locale et nationale avec des optimisations techniques, semantiques et structurelles adaptees a votre activite.",
+            'maintenance' => "Cette formule de maintenance {$tier} securise votre presence en ligne avec un suivi preventif, des correctifs rapides et un cadre d'intervention clair.",
+            'hebergement' => "Cette offre d'hebergement {$tier} apporte un environnement fiable pour votre site {$stack}, avec surveillance, disponibilite et assistance adaptees a votre niveau de besoin.",
+            'refonte-site' => "Cette refonte {$stack} modernise votre site existant: design, performance, lisibilite mobile et structure SEO sont retravailles pour relancer votre croissance digitale.",
+            default => 'Prestation digitale sur mesure avec cadrage, execution propre et accompagnement professionnel.',
+        };
+    }
+
+    private function buildHighlights(string $family, string $stack, string $tier): array
+    {
+        $common = [
+            "Developpement {$stack} propre et maintenable",
+            'Design responsive desktop/mobile',
+            'Mise en ligne avec checklist qualite',
         ];
+
+        return match ($family) {
+            'site-vitrine' => array_merge($common, ['Pages claires orientees conversion', 'Formulaire de contact optimise']),
+            'application-web' => array_merge($common, ['Fonctionnalites metier sur mesure', 'Architecture evolutive']),
+            'e-commerce' => array_merge($common, ['Tunnel de commande simplifie', 'Catalogue et fiches produits optimises']),
+            'wordpress-cms' => array_merge($common, ['Edition de contenu autonome', 'Back-office simplifie']),
+            'seo' => ['Audit SEO initial', 'Optimisations on-page prioritaires', 'Plan d\'actions classe par impact'],
+            'maintenance' => ['Surveillance et correctifs', 'Interventions selon SLA du pack', "Rapport d'actions periodique"],
+            'hebergement' => ['Infrastructure adaptee au trafic', 'Sauvegardes et supervision', "Support {$tier} selon formule"],
+            'refonte-site' => ['Audit de l\'existant', 'Nouveau design et structure', 'Migration progressive securisee'],
+            default => $common,
+        };
+    }
+
+    private function buildIncluded(string $family, string $stack, string $tier): array
+    {
+        return match ($family) {
+            'site-vitrine', 'application-web', 'e-commerce', 'wordpress-cms' => [
+                "Developpement {$stack} du projet",
+                'Configuration technique de base',
+                'Recette fonctionnelle avant livraison',
+                "Hebergement d'un an offert",
+                'SEO inclus',
+                '3 mois de maintenance Basic offerts',
+            ],
+            'seo' => [
+                'Analyse technique et semantique',
+                "Optimisations SEO du pack {$tier}",
+                'Recommandations prioritaires',
+            ],
+            'maintenance' => [
+                'Suivi de bon fonctionnement',
+                "Interventions de maintenance {$tier}",
+                'Correctifs dans le perimetre du pack',
+            ],
+            'hebergement' => [
+                "Environnement d'hebergement {$tier}",
+                'Sauvegardes planifiees',
+                'Assistance technique standard',
+            ],
+            'refonte-site' => [
+                'Audit UX et technique',
+                'Refonte front-end et structure',
+                'Livraison avec mise en ligne accompagnee',
+            ],
+            default => ['Prestation principale du produit', 'Validation qualite', 'Support de demarrage'],
+        };
     }
 }

@@ -8,6 +8,22 @@ use App\Core\Controller;
 use App\Core\Database;
 use App\Repositories\ProductRepository;
 
+$tcpdfBase = dirname(__DIR__, 2);
+if (!class_exists('\\TCPDF', false)) {
+    foreach ([
+        $tcpdfBase . '/vendor/tecnickcom/tcpdf/tcpdf.php',
+        $tcpdfBase . '/vendor/tcpdf/tcpdf.php',
+        $tcpdfBase . '/tcpdf/tcpdf.php',
+    ] as $tcpdfFile) {
+        if (is_file($tcpdfFile)) {
+            require_once $tcpdfFile;
+            if (class_exists('\\TCPDF', false)) {
+                break;
+            }
+        }
+    }
+}
+
 final class ShopController extends Controller
 {
     private function tcpdfBootstrapCandidates(): array
@@ -167,6 +183,7 @@ final class ShopController extends Controller
         }
 
         $orders = [];
+        $twofaEnabled = (int) ($user['totp_enabled'] ?? 0) === 1;
         $pdo = Database::getConnection();
         if ($pdo !== null) {
             try {
@@ -194,13 +211,29 @@ final class ShopController extends Controller
             } catch (\Throwable) {
                 $orders = [];
             }
+
+            try {
+                $twofaStmt = $pdo->prepare('SELECT totp_enabled FROM users WHERE id = :id LIMIT 1');
+                $twofaStmt->execute(['id' => (int) ($user['id'] ?? 0)]);
+                $twofaRow = $twofaStmt->fetch();
+                if (is_array($twofaRow)) {
+                    $twofaEnabled = (int) ($twofaRow['totp_enabled'] ?? 0) === 1;
+                }
+            } catch (\Throwable) {
+                // Keep session fallback if column/table migration is not yet applied.
+            }
         }
 
         $this->render('account/profile', [
             'metaTitle' => 'Mon profil client - Sazulis',
             'user' => $user,
             'orders' => $orders,
+            'twofaEnabled' => $twofaEnabled,
+            'profileNotice' => $_SESSION['profile_notice'] ?? null,
+            'profileError' => $_SESSION['profile_error'] ?? null,
         ]);
+
+        unset($_SESSION['profile_notice'], $_SESSION['profile_error']);
     }
 
     public function saveSignature(string $orderId): void
@@ -452,6 +485,25 @@ final class ShopController extends Controller
         } else {
             // Contrat
             $html .= '<br><h2>Conditions contractuelles</h2>';
+
+            // Tableau des prestations depuis order_items
+            if (!empty($items)) {
+                $html .= '<h2>Detail des prestations</h2>';
+                $html .= '<table cellpadding="6" cellspacing="0" border="1" width="100%" style="border-color:#e4eaf3;border-collapse:collapse;">';
+                $html .= '<tr style="background-color:#f8fafc;"><th align="left">Designation</th><th align="center">Qte</th><th align="right">PU TTC</th><th align="right">Total</th></tr>';
+                $runTotal = 0.0;
+                foreach ($items as $it) {
+                    $iName = htmlspecialchars((string) ($it['product_name'] ?? 'Produit'), ENT_QUOTES, 'UTF-8');
+                    $iQty  = max(1, (int) ($it['quantity'] ?? 1));
+                    $iPU   = (float) ($it['unit_price'] ?? 0);
+                    $iLT   = $iPU * $iQty;
+                    $runTotal += $iLT;
+                    $html .= '<tr><td>' . $iName . '</td><td align="center">' . $iQty . '</td><td align="right">' . number_format($iPU, 2, ',', ' ') . ' EUR</td><td align="right">' . number_format($iLT, 2, ',', ' ') . ' EUR</td></tr>';
+                }
+                $html .= '<tr><td colspan="3" align="right"><b>Total TTC</b></td><td align="right"><b>' . number_format($runTotal, 2, ',', ' ') . ' EUR</b></td></tr>';
+                $html .= '</table>';
+            }
+
             $html .= '<ul>';
             $html .= '<li>Commande liee : ' . $orderRef . '</li>';
             $html .= '<li>Statut actuel : ' . $status . '</li>';
@@ -620,7 +672,14 @@ final class ShopController extends Controller
             'processing' => 40,
             default => 0,
         };
-        $total   = (float) ($order['total'] ?? 0);
+        $items   = isset($order['items']) && is_array($order['items']) ? $order['items'] : [];
+        $total   = 0.0;
+        foreach ($items as $item) {
+            $total += (float) ($item['unit_price'] ?? 0) * max(1, (int) ($item['quantity'] ?? 1));
+        }
+        if ($total === 0.0) {
+            $total = (float) ($order['total'] ?? 0);
+        }
         $acompte = round($total * 0.30, 2);
         $solde   = round($total - $acompte, 2);
 
@@ -719,8 +778,21 @@ CSS;
         // 4) Recette
         self::writeBlock($pdf, $css . '<div class="wrap"><div class="section"><div class="h">4) Recette, validations &amp; acceptation</div><ul><li>Une phase de <b>recette</b> est prevue : le Client verifie les livrables et remonte les anomalies sous 7 jours.</li><li>A defaut de retour sous 7 jours, les livrables sont reputes <b>acceptes</b>.</li><li>Les corrections couvrent les bugs et ecarts au perimetre, pas les changements d\'avis.</li></ul></div></div>');
 
-        // 5) Prix
-        self::writeBlock($pdf, $css . '<div class="wrap"><div class="section"><div class="h">5) Prix, paiement &amp; suspension</div><table class="table"><thead><tr><th>Element</th><th>Montant</th><th>Modalite</th></tr></thead><tbody><tr><td>Total prestation</td><td><b>' . $iTotal . '</b></td><td>Selon commande</td></tr><tr><td>Acompte (30%)</td><td><b>' . $iAcompte . '</b></td><td>Avant demarrage</td></tr><tr><td>Solde (70%)</td><td><b>' . $iSolde . '</b></td><td>Avant livraison</td></tr></tbody></table><ul><li>Le demarrage est conditionne au paiement de l\'acompte.</li><li>L\'acompte est non remboursable apres 7 jours suivant son paiement.</li><li>En cas de retard, le Prestataire peut <b>suspendre</b> la prestation.</li></ul></div></div>');
+        // 5) Prix – tableau des lignes produits depuis order_items
+        $itemsDetailHtml = '';
+        if (!empty($items)) {
+            $itemsDetailHtml .= '<br><table class="table"><thead><tr><th>Designation</th><th>Qte</th><th align="right">PU TTC</th><th align="right">Total</th></tr></thead><tbody>';
+            foreach ($items as $item) {
+                $iName = htmlspecialchars((string) ($item['product_name'] ?? 'Produit'), ENT_QUOTES, 'UTF-8');
+                $iQty  = max(1, (int) ($item['quantity'] ?? 1));
+                $iPU   = (float) ($item['unit_price'] ?? 0);
+                $iLT   = $iPU * $iQty;
+                $itemsDetailHtml .= '<tr><td>' . $iName . '</td><td>' . $iQty . '</td><td align="right">' . number_format($iPU, 2, ',', ' ') . ' EUR</td><td align="right">' . number_format($iLT, 2, ',', ' ') . ' EUR</td></tr>';
+            }
+            $itemsDetailHtml .= '<tr><td colspan="3" align="right"><b>Total TTC</b></td><td align="right"><b>' . $iTotal . '</b></td></tr>';
+            $itemsDetailHtml .= '</tbody></table>';
+        }
+        self::writeBlock($pdf, $css . '<div class="wrap"><div class="section"><div class="h">5) Prix, paiement &amp; suspension</div>' . $itemsDetailHtml . '<br><table class="table"><thead><tr><th>Element</th><th>Montant</th><th>Modalite</th></tr></thead><tbody>' . ($itemsDetailHtml === '' ? '<tr><td>Total prestation</td><td><b>' . $iTotal . '</b></td><td>Selon commande</td></tr>' : '') . '<tr><td>Acompte (30%)</td><td><b>' . $iAcompte . '</b></td><td>Avant demarrage</td></tr><tr><td>Solde (70%)</td><td><b>' . $iSolde . '</b></td><td>Avant livraison</td></tr></tbody></table><ul><li>Le demarrage est conditionne au paiement de l\'acompte.</li><li>L\'acompte est non remboursable apres 7 jours suivant son paiement.</li><li>En cas de retard, le Prestataire peut <b>suspendre</b> la prestation.</li></ul></div></div>');
 
         // 6) Obligations client
         self::writeBlock($pdf, $css . '<div class="wrap"><div class="section"><div class="h">6) Obligations du Client</div><ul><li>Le Client fournit textes, images, logos, acces dans des delais raisonnables.</li><li>Le Prestataire n\'est pas responsable des retards dus a l\'absence de contenus ou d\'acces.</li><li>Le Client garantit disposer des droits sur les contenus fournis.</li></ul></div></div>');

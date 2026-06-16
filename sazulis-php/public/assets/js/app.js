@@ -83,7 +83,10 @@
       try {
         const res = await fetch(`${window.SAZULIS_BASE}/api/orders`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': String(window.SAZULIS_CSRF || ''),
+          },
           body: JSON.stringify(payload),
         });
         const data = await res.json();

@@ -1,4 +1,27 @@
 RewriteEngine On
+Options -Indexes
+
+ErrorDocument 403 /errors/403
+ErrorDocument 404 /errors/404
+ErrorDocument 410 /errors/410
+ErrorDocument 500 /errors/500
+
+# Preview error pages with clean URLs
+RewriteRule ^errors/(301|403|404|410|500)/?$ public/errors/$1.php [L,QSA,NC]
+
+# Example permanent redirect (301) from legacy sitemap endpoint
+RewriteRule ^sitemap-index\.xml$ sitemap.xml [R=301,L,NC]
+
+# Block unsafe HTTP verbs
+RewriteCond %{REQUEST_METHOD} ^(TRACE|TRACK|DEBUG) [NC]
+RewriteRule ^ - [F,L]
+
+# Never expose internal application directories
+RewriteRule ^(?:app|config|database|routes|storage|vendor)(?:/|$) - [F,L,NC]
+
+# Deny direct access to hidden/sensitive files
+RewriteRule (^|/)\. - [F,L]
+RewriteRule ^(?:\.env|composer\.(?:json|lock)|phpunit\.xml(?:\.dist)?|README\.md|FOOTER_LINKS\.md)$ - [F,L,NC]
 
 # Keep direct access to files/folders (including /public/assets)
 RewriteCond %{REQUEST_FILENAME} -f [OR]

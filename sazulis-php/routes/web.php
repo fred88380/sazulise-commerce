@@ -33,9 +33,17 @@ return static function (Router $router): void {
     $router->post('/audit', [PageController::class, 'audit']);
 
     $router->get('/login', [AuthController::class, 'loginForm']);
+    $router->get('/captcha/auth', [AuthController::class, 'captchaImage']);
     $router->post('/login', [AuthController::class, 'login']);
     $router->get('/register', [AuthController::class, 'registerForm']);
     $router->post('/register', [AuthController::class, 'register']);
+
+    $router->get('/2fa/setup', [AuthController::class, 'setup2faForm']);
+    $router->post('/2fa/confirm', [AuthController::class, 'confirm2fa']);
+    $router->post('/2fa/skip', [AuthController::class, 'skip2fa']);
+    $router->post('/2fa/disable', [AuthController::class, 'disable2fa']);
+    $router->get('/2fa/verify', [AuthController::class, 'verify2faForm']);
+    $router->post('/2fa/verify', [AuthController::class, 'verify2fa']);
 
     $router->get('/admin/login', [AuthController::class, 'adminLoginForm']);
     $router->post('/admin/login', [AuthController::class, 'adminLogin']);

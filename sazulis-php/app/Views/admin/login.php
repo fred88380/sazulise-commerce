@@ -9,6 +9,7 @@ $basePath = isset($basePath) ? (string) $basePath : '';
     </div>
 
     <form class="checkout-form" method="post" action="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/admin/login">
+        <input type="hidden" name="__csrf" value="<?= htmlspecialchars((string) ($csrfToken ?? ''), ENT_QUOTES, 'UTF-8') ?>">
         <label>Email admin
             <input type="email" name="email" required>
         </label>

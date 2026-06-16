@@ -15,6 +15,9 @@ final class View
             return;
         }
 
+        $data['csrfToken'] = $data['csrfToken'] ?? Csrf::token();
+        $data['csrfField'] = $data['csrfField'] ?? Csrf::field();
+
         extract($data, EXTR_SKIP);
         $contentView = $viewPath;
         require __DIR__ . '/../Views/layouts/main.php';

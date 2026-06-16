@@ -12,6 +12,7 @@ $basePath = $runtimeBasePath !== '' ? $runtimeBasePath : $configuredBasePath;
 $assetsBasePath = $basePath . '/public';
 $user = isset($_SESSION['user']) && is_array($_SESSION['user']) ? $_SESSION['user'] : null;
 $role = (string) ($user['role'] ?? 'guest');
+$twofaEnabled = ((int) ($user['totp_enabled'] ?? 0) === 1);
 
 if (!defined('SAZULIS_IN_LAYOUT')) {
     define('SAZULIS_IN_LAYOUT', true);
@@ -56,11 +57,16 @@ if (!defined('SAZULIS_IN_LAYOUT')) {
         <?php if ($role === 'admin'): ?>
             <a href="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/admin">Administration</a>
             <form method="post" action="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/logout" class="topbar-inline-form">
+                <?= $csrfField ?? '' ?>
                 <button class="topbar-nav-btn is-danger" type="submit">Deconnexion</button>
             </form>
         <?php elseif ($role === 'client'): ?>
             <a href="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/profile">Profil</a>
+            <span class="topbar-2fa-badge <?= $twofaEnabled ? 'is-on' : 'is-off' ?>">
+                <?= $twofaEnabled ? '2FA activee' : '2FA inactive' ?>
+            </span>
             <form method="post" action="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>/logout" class="topbar-inline-form">
+                <?= $csrfField ?? '' ?>
                 <button class="topbar-nav-btn is-danger" type="submit">Deconnexion</button>
             </form>
         <?php else: ?>
@@ -99,6 +105,7 @@ if (!defined('SAZULIS_IN_LAYOUT')) {
 
 <script>window.SAZULIS_BASE = '<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>';</script>
 <script>window.SAZULIS_USER = <?= $user ? json_encode($user, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : 'null' ?>;</script>
+<script>window.SAZULIS_CSRF = '<?= htmlspecialchars((string) ($csrfToken ?? ''), ENT_QUOTES, 'UTF-8') ?>';</script>
 <script src="<?= htmlspecialchars($assetsBasePath, ENT_QUOTES, 'UTF-8') ?>/assets/js/app.js" defer></script>
 </body>
 </html>

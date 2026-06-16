@@ -26,6 +26,18 @@ final class Router
         $path = parse_url($uri, PHP_URL_PATH) ?: '/';
         $path = rtrim($path, '/') ?: '/';
 
+        if ($method === 'POST' && !Csrf::validateRequest()) {
+            http_response_code(403);
+            $errorPage = dirname(__DIR__, 2) . '/public/errors/403.php';
+            if (is_file($errorPage)) {
+                require $errorPage;
+                return;
+            }
+
+            echo '403 - Invalid CSRF token';
+            return;
+        }
+
         foreach ($this->routes[$method] ?? [] as $route => $handler) {
             $pattern = '#^' . preg_replace('#\{[a-zA-Z_][a-zA-Z0-9_]*\}#', '([a-zA-Z0-9_-]+)', $route) . '$#';
             if (!preg_match($pattern, $path, $matches)) {
@@ -38,6 +50,12 @@ final class Router
         }
 
         http_response_code(404);
+        $errorPage = dirname(__DIR__, 2) . '/public/errors/404.php';
+        if (is_file($errorPage)) {
+            require $errorPage;
+            return;
+        }
+
         echo '404 - Page not found';
     }
 
