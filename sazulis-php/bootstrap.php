@@ -9,7 +9,10 @@ $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
 ini_set('session.use_strict_mode', '1');
 ini_set('session.use_only_cookies', '1');
 ini_set('session.cookie_httponly', '1');
-ini_set('session.cookie_samesite', 'Lax');
+ini_set('session.cookie_samesite', 'Strict');
+ini_set('session.gc_maxlifetime', '3600');
+ini_set('session.sid_length', '64');
+ini_set('session.sid_bits_per_character', '6');
 
 if ($https) {
     ini_set('session.cookie_secure', '1');
@@ -20,19 +23,35 @@ session_start();
 
 if (!isset($_SESSION['__session_started_at'])) {
     $_SESSION['__session_started_at'] = time();
+    $_SESSION['__session_ip'] = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    $_SESSION['__session_ua'] = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
     session_regenerate_id(true);
+}
+
+if (isset($_SESSION['__session_ip']) && $_SESSION['__session_ip'] !== ($_SERVER['REMOTE_ADDR'] ?? '')) {
+    error_log('[SAZULIS][SECURITY] Session IP mismatch: ' . $_SESSION['__session_ip'] . ' != ' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
+    session_destroy();
+    http_response_code(403);
+    die('Session security violation detected');
+}
+
+$sessionAge = time() - ((int) $_SESSION['__session_started_at'] ?? 0);
+if ($sessionAge > 3600) {
+    session_regenerate_id(true);
+    $_SESSION['__session_started_at'] = time();
 }
 
 if (!headers_sent()) {
     ini_set('expose_php', '0');
     header_remove('X-Powered-By');
     header('X-Content-Type-Options: nosniff');
-    header('X-Frame-Options: SAMEORIGIN');
+    header('X-Frame-Options: DENY');
+    header('X-XSS-Protection: 1; mode=block');
     header('Referrer-Policy: strict-origin-when-cross-origin');
     header('Cross-Origin-Opener-Policy: same-origin');
     header('Cross-Origin-Resource-Policy: same-origin');
     header('Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=()');
-    header("Content-Security-Policy: default-src 'self'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self';");
+    header("Content-Security-Policy: default-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self';");
     if ($https) {
         header('Strict-Transport-Security: max-age=31536000; includeSubDomains; preload');
     }

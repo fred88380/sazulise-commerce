@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Core\ContentModeration;
 use App\Core\Controller;
 use App\Core\Database;
 use App\Core\RateLimiter;
+use App\Core\SecurityValidator;
 use App\Core\Totp;
 
 final class AuthController extends Controller
@@ -173,11 +175,19 @@ final class AuthController extends Controller
         $email = trim((string) ($_POST['email'] ?? ''));
         $password = (string) ($_POST['password'] ?? '');
         $captchaInput = trim((string) ($_POST['captcha_code'] ?? ''));
-        $normalizedEmail = mb_strtolower($email);
+
+        $sanitizedEmail = SecurityValidator::sanitizeEmail($email);
+        if ($sanitizedEmail === null) {
+            $_SESSION['auth_error'] = 'Email invalide.';
+            $this->redirect('/login');
+        }
+
+        $normalizedEmail = mb_strtolower($sanitizedEmail);
         $adminEmail = 'sazulis@outlook.fr';
-        $throttleKey = $this->loginThrottleKey($email);
+        $throttleKey = $this->loginThrottleKey($sanitizedEmail);
 
         if (RateLimiter::tooManyAttempts($throttleKey, 7, 900)) {
+            ContentModeration::logViolation('Login rate limit exceeded', ['trop_de_tentatives'], 'unknown', 'login_attempt');
             $_SESSION['auth_error'] = 'Trop de tentatives. Reessaie dans quelques minutes.';
             $this->redirect('/login');
         }
@@ -188,9 +198,16 @@ final class AuthController extends Controller
             $this->redirect('/login');
         }
 
-        if ($email === '' || $password === '') {
+        if ($sanitizedEmail === '' || $password === '') {
             RateLimiter::hit($throttleKey, 900);
             $_SESSION['auth_error'] = 'Email et mot de passe requis.';
+            $this->redirect('/login');
+        }
+
+        if (SecurityValidator::detectSqlInjection($password)) {
+            RateLimiter::hit($throttleKey, 900);
+            ContentModeration::logViolation('SQL injection attempt in login', ['sql_injection'], 'unknown', 'login_attempt');
+            $_SESSION['auth_error'] = 'Tentative suspecte détectée.';
             $this->redirect('/login');
         }
 
@@ -202,7 +219,7 @@ final class AuthController extends Controller
         }
 
         $stmt = $pdo->prepare('SELECT id, full_name, email, password_hash, role, totp_enabled, totp_secret FROM users WHERE email = :email LIMIT 1');
-        $stmt->execute(['email' => $email]);
+        $stmt->execute(['email' => $sanitizedEmail]);
         $user = $stmt->fetch();
 
         if (!$user || !password_verify($password, (string) ($user['password_hash'] ?? ''))) {
@@ -215,7 +232,6 @@ final class AuthController extends Controller
 
         $role = ((string) ($user['role'] ?? 'client') === 'admin' || $normalizedEmail === $adminEmail) ? 'admin' : 'client';
 
-        // Si 2FA actif → suspendre la session et demander le code TOTP
         if ((int) ($user['totp_enabled'] ?? 0) === 1) {
             $_SESSION['auth_2fa_pending'] = [
                 'id'    => (int) $user['id'],
@@ -255,8 +271,34 @@ final class AuthController extends Controller
             $this->redirect('/register');
         }
 
-        if ($name === '' || $email === '' || strlen($password) < 8) {
-            $_SESSION['auth_error'] = 'Nom, email et mot de passe de 8 caracteres minimum requis.';
+        $errors = [];
+
+        if ($name === '') {
+            $errors[] = 'Le nom est requis.';
+        } else {
+            $nameErrors = ContentModeration::validateDisplayName($name);
+            if (!empty($nameErrors)) {
+                $errors = array_merge($errors, $nameErrors);
+            }
+        }
+
+        $sanitizedEmail = SecurityValidator::sanitizeEmail($email);
+        if ($sanitizedEmail === null) {
+            $errors[] = 'Email invalide ou suspecte.';
+        }
+
+        $passwordErrors = SecurityValidator::validatePassword($password);
+        if (!empty($passwordErrors)) {
+            $errors[] = 'Mot de passe faible. Requis: 12+ caractères, majuscule, minuscule, chiffre, caractère spécial.';
+        }
+
+        if (!empty($errors)) {
+            $_SESSION['auth_error'] = implode(' | ', $errors);
+            $this->redirect('/register');
+        }
+
+        if (SecurityValidator::detectSqlInjection($name . ' ' . $email)) {
+            $_SESSION['auth_error'] = 'Requête suspecte détectée.';
             $this->redirect('/register');
         }
 
@@ -267,29 +309,31 @@ final class AuthController extends Controller
         }
 
         $check = $pdo->prepare('SELECT id FROM users WHERE email = :email LIMIT 1');
-        $check->execute(['email' => $email]);
+        $check->execute(['email' => $sanitizedEmail]);
         if ($check->fetch()) {
             $_SESSION['auth_error'] = 'Cet email existe deja.';
             $this->redirect('/register');
         }
 
         $hash = password_hash($password, PASSWORD_DEFAULT);
+        $cleanName = SecurityValidator::sanitizeText($name, 100);
         $stmt = $pdo->prepare('INSERT INTO users (full_name, email, password_hash, role) VALUES (:name, :email, :hash, :role)');
         $stmt->execute([
-            'name' => $name,
-            'email' => $email,
+            'name' => $cleanName,
+            'email' => $sanitizedEmail,
             'hash' => $hash,
             'role' => 'client',
         ]);
 
         $_SESSION['user'] = [
             'id'    => (int) $pdo->lastInsertId(),
-            'name'  => $name,
-            'email' => $email,
+            'name'  => $cleanName,
+            'email' => $sanitizedEmail,
             'role'  => 'client',
         ];
 
-        // Toujours proposer la 2FA apres inscription
+        ContentModeration::logViolation('User registered: ' . $sanitizedEmail, [], (string) $_SESSION['user']['id'], 'registration');
+
         $this->redirect('/2fa/setup?origin=register');
     }
 
