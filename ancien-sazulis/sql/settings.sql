@@ -1,5 +1,0 @@
-CREATE TABLE settings (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    cle VARCHAR(100) NOT NULL UNIQUE,
-    valeur TEXT
-);

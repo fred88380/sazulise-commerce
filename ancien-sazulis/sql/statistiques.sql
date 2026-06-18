@@ -1,6 +1,0 @@
-CREATE TABLE statistiques (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    type VARCHAR(50) NOT NULL,
-    valeur INT NOT NULL,
-    date_enregistrement DATETIME DEFAULT CURRENT_TIMESTAMP
-);

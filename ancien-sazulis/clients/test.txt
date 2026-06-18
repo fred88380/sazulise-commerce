@@ -1,4 +1,0 @@
-Url: https://test.com
-Emails: contact@test.com
-Statut: Nouveau
-url: https://byteminds.com
