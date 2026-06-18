@@ -6,11 +6,16 @@ Options -Indexes
     Deny from all
 </Files>
 
-# Redirige les erreurs 404 et 410
+# Redirige les erreurs 403, 404, 410 et 500
+ErrorDocument 403 /error403.php
 ErrorDocument 404 /error404.php
 ErrorDocument 410 /error410.php
+ErrorDocument 500 /error500.php
 
 RewriteEngine On
+
+# Apercu des pages d erreur (301 compris)
+RewriteRule ^error(301|403|404|410|500)/?$ error$1.php [L,QSA,NC]
 
 # 1. Force le HTTPS et supprime le WWW (redirection vers https://sazulis.fr)
 RewriteCond %{HTTP_HOST} ^www\.sazulis\.fr [NC]
