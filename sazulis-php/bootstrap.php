@@ -92,6 +92,8 @@ spl_autoload_register(static function (string $class): void {
     }
 });
 
+\App\Core\SecurityShield::enforce(__DIR__);
+
 $envPath = __DIR__ . '/.env';
 if (is_file($envPath)) {
     $pairs = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
@@ -112,7 +114,5 @@ if (empty($_ENV['APP_BASE_PATH'])) {
     $_ENV['APP_BASE_PATH'] = $basePath;
     putenv('APP_BASE_PATH=' . $basePath);
 }
-
-\App\Core\SecurityShield::enforce();
 
 $config = require __DIR__ . '/config/app.php';
